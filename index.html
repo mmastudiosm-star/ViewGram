@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>MiniGram</title>
+<title>ViewGram</title>
 <style>
   :root {
     --bg: #fafafa; --card: #ffffff; --text: #262626; --text-secondary: #8e8e8e;
@@ -32,7 +32,15 @@
     border-bottom: 1px solid var(--border); height: 54px;
     display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
   }
-  .top-bar .logo { font-family: 'Segoe Script','Brush Script MT',cursive; font-size: 26px; }
+  .top-bar .logo {
+    font-family: 'Segoe Script','Brush Script MT',cursive;
+    font-size: 26px;
+    font-weight: 700;
+    background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .top-bar .actions { display: flex; gap: 16px; align-items: center; }
   .top-bar .actions button { font-size: 22px; color: var(--text); }
 
@@ -229,7 +237,14 @@
 
   /* ===== AUTH ===== */
   .auth-wrap { max-width: 380px; margin: 40px auto; padding: 0 20px; text-align: center; }
-  .auth-wrap .logo { font-family: 'Segoe Script','Brush Script MT',cursive; font-size: 44px; margin-bottom: 30px; }
+  .auth-wrap .logo {
+    font-family: 'Segoe Script','Brush Script MT',cursive;
+    font-size: 44px; margin-bottom: 30px; font-weight: 700;
+    background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 12px; }
   .auth-card input {
     width: 100%; padding: 11px 10px; background: var(--bg);
@@ -470,7 +485,7 @@
 
 <!-- AUTH -->
 <div id="authScreen" class="auth-wrap hidden">
-  <div class="logo">MiniGram</div>
+  <div class="logo">ViewGram</div>
   <div class="auth-card">
     <div id="loginForm">
       <input type="email" id="loginEmail" placeholder="ایمیل" autocomplete="email" />
@@ -492,7 +507,7 @@
 <!-- APP -->
 <div id="app" class="hidden">
   <div class="top-bar">
-    <div class="logo">MiniGram</div>
+    <div class="logo">ViewGram</div>
     <div class="actions">
       <button id="navMessages" title="پیام‌ها">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
@@ -562,7 +577,7 @@
       </div>
     </div>
     <div class="profile-username" id="profileUsername">@user</div>
-    <div class="profile-bio" id="profileBio">به MiniGram خوش آمدی 👋</div>
+    <div class="profile-bio" id="profileBio">به ViewGram خوش آمدی 👋</div>
     <div style="margin-bottom:12px;display:flex;gap:8px">
       <button class="btn btn-secondary" id="editProfileBtn" style="flex:1;border:1px solid var(--border)">ویرایش پروفایل</button>
     </div>
@@ -836,7 +851,7 @@
       }
       var uname = currentProfile.username || 'کاربر';
       $('profileUsername').textContent = '@' + uname;
-      $('profileBio').textContent = currentProfile.bio || 'به MiniGram خوش آمدی 👋';
+      $('profileBio').textContent = currentProfile.bio || 'به ViewGram خوش آمدی 👋';
       renderProfileAvatar();
 
       var p = await sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
@@ -911,7 +926,7 @@
       currentProfile.username = uname;
       currentProfile.bio = bio;
       $('profileUsername').textContent = '@' + uname;
-      $('profileBio').textContent = bio || 'به MiniGram خوش آمدی 👋';
+      $('profileBio').textContent = bio || 'به ViewGram خوش آمدی 👋';
       toast('ذخیره شد!');
       $('editProfileModal').classList.remove('show');
       loadFeed();
@@ -1448,7 +1463,6 @@
     var saveBtn = el.querySelector('[data-save]');
 
     imageWrap.addEventListener('click', function (e) {
-      // اگه روی ویدیو کلیک شد، دابل‌تپ رو نادیده بگیر
       if (e.target.tagName === 'VIDEO') return;
       var now = Date.now();
       if (now - lastTapTime < 300) {
