@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>MiniGram</title>
+<style>
+  :root {
+    --bg: #fafafa; --card: #ffffff; --text: #262626; --text-secondary: #8e8e8e;
+    --border: #dbdbdb; --border-light: #efefef; --blue: #0095f6; --red: #ed4956; --hover: #f2f2f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000; --card: #000000; --text: #f5f5f5; --text-secondary: #a8a8a8;
+      --border: #262626; --border-light: #1a1a1a; --hover: #1a1a1a;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); direction: rtl; overscroll-behavior-y: none;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea { font-family: inherit; }
+  img { display: block; max-width: 100%; }
+  .hidden { display: none !important; }
+
+  /* ===== TOP BAR ===== */
+  .top-bar {
+    position: sticky; top: 0; z-index: 50; background: var(--card);
+    border-bottom: 1px solid var(--border); height: 54px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+  }
+  .top-bar .logo { font-family: 'Segoe Script','Brush Script MT',cursive; font-size: 26px; }
+  .top-bar .actions { display: flex; gap: 16px; align-items: center; }
+  .top-bar .actions button { font-size: 22px; color: var(--text); }
+
+  /* ===== MAIN ===== */
+  .main { max-width: 630px; margin: 0 auto; padding-bottom: 70px; }
+
+  /* ===== PAGE VISIBILITY ===== */
+  #homeView, #profileView, #searchView, #otherProfileView, #messagesView, #chatView {
+    display: none;
+  }
+  #homeView:not(.hidden),
+  #profileView:not(.hidden),
+  #searchView:not(.hidden),
+  #otherProfileView:not(.hidden),
+  #messagesView:not(.hidden) { display: block; }
+  #chatView:not(.hidden) { display: flex; }
+
+  /* ===== STORIES ===== */
+  .stories {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 14px 0; display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none;
+  }
+  .stories::-webkit-scrollbar { display: none; }
+  .story {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    flex-shrink: 0; padding: 0 4px; cursor: pointer;
+  }
+  .story:first-child { margin-right: 12px; }
+  .story:last-child { margin-left: 12px; }
+  .story-avatar {
+    width: 66px; height: 66px; border-radius: 50%; padding: 2px;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .story-avatar.self { background: var(--border); position: relative; }
+  .story-avatar.self::after {
+    content: '+'; position: absolute; bottom: 0; left: 0;
+    width: 22px; height: 22px; background: var(--blue); color: #fff; border-radius: 50%;
+    border: 2px solid var(--card); display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: bold; line-height: 1;
+  }
+  .story-avatar-inner {
+    width: 100%; height: 100%; border-radius: 50%; background: var(--card);
+    padding: 2px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .story-avatar .letter {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 22px;
+  }
+  .story-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .story-name { font-size: 12px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ===== POST ===== */
+  .post { background: var(--card); border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  @media (min-width: 640px) {
+    .post { border: 1px solid var(--border); border-radius: 8px; margin: 16px 0; overflow: hidden; }
+  }
+  .post-header { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .post-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px; flex-shrink: 0; cursor: pointer; overflow: hidden;
+  }
+  .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .post-username { font-weight: 600; font-size: 14px; cursor: pointer; }
+  .post-more { margin-right: auto; font-size: 20px; letter-spacing: 1px; padding: 0 6px; }
+
+  .post-image-wrap {
+    position: relative; background: #000; aspect-ratio: 1 / 1; overflow: hidden; user-select: none;
+  }
+  .post-image-wrap img,
+  .post-image-wrap video {
+    width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none;
+  }
+  .post-image-wrap .video-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(0,0,0,0.6); color: #fff;
+    padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; pointer-events: none;
+  }
+  .heart-burst {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0); font-size: 90px; opacity: 0; pointer-events: none;
+  }
+  .heart-burst.show { animation: heartPop .9s ease-out; }
+  @keyframes heartPop {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    30% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+    60% { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1.1); opacity: 0; }
+  }
+  .post-actions { padding: 6px 12px; display: flex; align-items: center; gap: 14px; }
+  .post-actions button { font-size: 24px; padding: 6px 2px; line-height: 1; }
+  .post-actions button.liked svg { fill: var(--red); stroke: var(--red); }
+  .post-actions .save-btn { margin-right: auto; }
+  .post-actions svg { width: 24px; height: 24px; display: block; }
+  .post-likes { padding: 4px 16px 6px; font-size: 14px; font-weight: 600; }
+  .post-caption { padding: 0 16px 6px; font-size: 14px; line-height: 1.4; }
+  .post-caption b { font-weight: 600; margin-left: 6px; }
+  .post-comments-link { padding: 0 16px 6px; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
+  .post-time { padding: 0 16px 12px; font-size: 10px; color: var(--text-secondary); }
+
+  /* ===== COMPOSER ===== */
+  .composer { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin: 12px 0; padding: 14px; display: none; }
+  .composer.show { display: block; }
+  .composer h3 { font-size: 16px; margin-bottom: 12px; text-align: center; font-weight: 600; }
+  .composer .media-tabs { display: flex; gap: 6px; margin-bottom: 10px; justify-content: center; }
+  .composer .media-tabs button {
+    padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    background: var(--hover); color: var(--text-secondary);
+  }
+  .composer .media-tabs button.active { background: var(--blue); color: #fff; }
+  .composer .drop {
+    display: block; text-align: center; padding: 30px 20px;
+    border: 2px dashed var(--border); border-radius: 8px;
+    color: var(--text-secondary); cursor: pointer; margin-bottom: 12px; font-size: 14px;
+  }
+  .composer .drop:hover { border-color: var(--blue); color: var(--blue); }
+  .composer textarea {
+    width: 100%; border: none; border-bottom: 1px solid var(--border);
+    padding: 10px 4px; font-size: 14px; resize: none; background: transparent;
+    color: var(--text); min-height: 44px; margin-bottom: 12px;
+  }
+  .composer textarea:focus { outline: none; }
+  .composer #preview { width: 100%; max-height: 400px; object-fit: contain; border-radius: 6px; margin-bottom: 12px; display: none; background: #000; }
+  .composer #previewVideo { width: 100%; max-height: 400px; border-radius: 6px; margin-bottom: 12px; display: none; background: #000; }
+  .composer .row { display: flex; gap: 8px; justify-content: flex-end; }
+
+  .btn { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-secondary { background: transparent; color: var(--text); }
+  .btn-secondary:hover { background: var(--hover); }
+
+  /* ===== PROFILE ===== */
+  .profile-page { padding: 20px 16px; }
+  .profile-header { display: flex; gap: 24px; align-items: center; margin-bottom: 20px; }
+  .profile-avatar {
+    width: 86px; height: 86px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 34px; flex-shrink: 0;
+    position: relative; overflow: hidden; cursor: pointer;
+  }
+  .profile-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .profile-avatar .edit-badge {
+    position: absolute; bottom: 0; left: 0;
+    width: 28px; height: 28px; background: var(--blue); color: #fff; border-radius: 50%;
+    border: 2px solid var(--card); display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: bold;
+  }
+  .profile-stats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+  .profile-stats .num { font-weight: 600; font-size: 16px; }
+  .profile-stats .label { font-size: 13px; color: var(--text-secondary); }
+  .profile-username { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .profile-bio { font-size: 14px; margin-bottom: 16px; color: var(--text-secondary); }
+  .profile-tabs { display: flex; border-top: 1px solid var(--border); margin: 20px -16px 0; }
+  .profile-tabs button {
+    flex: 1; padding: 12px; font-size: 12px; letter-spacing: 1px;
+    color: var(--text-secondary); border-bottom: 2px solid transparent;
+    background: none;
+  }
+  .profile-tabs button.active {
+    color: var(--text); font-weight: 700; border-bottom-color: var(--text);
+    background: none;
+  }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 0 -16px; }
+  .grid .cell { aspect-ratio: 1; background: #000; overflow: hidden; position: relative; }
+  .grid .cell img { width: 100%; height: 100%; object-fit: cover; }
+  .grid .cell .play-icon {
+    position: absolute; top: 6px; left: 6px; color: #fff; font-size: 18px;
+    text-shadow: 0 0 4px rgba(0,0,0,0.7); pointer-events: none;
+  }
+
+  .other-profile-actions { display: flex; gap: 8px; margin-bottom: 16px; }
+  .other-profile-actions button {
+    flex: 1; padding: 8px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; background: var(--hover); color: var(--text);
+  }
+  .other-profile-actions button.primary { background: var(--blue); color: #fff; }
+  .other-profile-actions button.primary.following { background: var(--hover); color: var(--text); }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+    border-top: 1px solid var(--border); height: 54px;
+    display: flex; align-items: center; justify-content: space-around; z-index: 100;
+  }
+  .bottom-nav button { padding: 8px 18px; }
+  .bottom-nav svg { width: 24px; height: 24px; display: block; }
+  .bottom-nav button.active svg { fill: currentColor; }
+
+  /* ===== AUTH ===== */
+  .auth-wrap { max-width: 380px; margin: 40px auto; padding: 0 20px; text-align: center; }
+  .auth-wrap .logo { font-family: 'Segoe Script','Brush Script MT',cursive; font-size: 44px; margin-bottom: 30px; }
+  .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 12px; }
+  .auth-card input {
+    width: 100%; padding: 11px 10px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 4px; margin-bottom: 8px;
+    font-size: 14px; color: var(--text);
+  }
+  .auth-card input:focus { outline: none; border-color: var(--text-secondary); }
+  .auth-card .btn-primary { width: 100%; padding: 10px; margin-top: 8px; }
+  .auth-switch { font-size: 13px; color: var(--blue); cursor: pointer; margin-top: 12px; display: block; }
+  .auth-note { font-size: 12px; color: var(--text-secondary); margin-top: 16px; line-height: 1.5; }
+
+  /* ===== SEARCH ===== */
+  .search-page { padding: 12px 16px 80px; max-width: 630px; margin: 0 auto; }
+  .search-box { position: relative; margin-bottom: 16px; }
+  .search-box input {
+    width: 100%; background: var(--hover); border: none; border-radius: 10px;
+    padding: 10px 40px 10px 14px; font-size: 14px; color: var(--text);
+  }
+  .search-box input:focus { outline: none; }
+  .search-box .icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); pointer-events: none; }
+  .search-section-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 12px 0 8px; }
+  .search-results { display: flex; flex-direction: column; }
+  .search-user {
+    display: flex; align-items: center; gap: 12px; padding: 10px 4px;
+    cursor: pointer; border-radius: 10px; transition: background .15s;
+  }
+  .search-user:hover { background: var(--hover); }
+  .search-user .avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 16px; flex-shrink: 0; overflow: hidden;
+  }
+  .search-user .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .search-user .info { flex: 1; min-width: 0; }
+  .search-user .info .name { font-weight: 600; font-size: 14px; }
+  .search-user .info .sub { font-size: 12px; color: var(--text-secondary); }
+  .search-user .follow-btn {
+    padding: 6px 14px; background: var(--blue); color: #fff;
+    border-radius: 8px; font-size: 13px; font-weight: 600;
+  }
+  .search-user .follow-btn.following { background: var(--hover); color: var(--text); }
+  .search-empty { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
+
+  /* ===== STORY VIEWER ===== */
+  .story-viewer { position: fixed; inset: 0; background: #000; z-index: 500; display: none; flex-direction: column; }
+  .story-viewer.show { display: flex !important; }
+  .story-progress-bar { display: flex; gap: 3px; padding: 10px 10px 0; position: relative; z-index: 3; }
+  .story-progress-seg { flex: 1; height: 2.5px; background: rgba(255,255,255,0.35); border-radius: 2px; overflow: hidden; position: relative; }
+  .story-progress-seg .fill { position: absolute; inset: 0; width: 0%; background: #fff; border-radius: 2px; }
+  .story-progress-seg.done .fill { width: 100%; }
+  .story-progress-seg.active .fill { animation: storyFill 5s linear forwards; }
+  @keyframes storyFill { from { width: 0; } to { width: 100%; } }
+  .story-viewer-header {
+    position: absolute; top: 20px; left: 0; right: 0; padding: 0 14px;
+    z-index: 3; display: flex; align-items: center; gap: 10px; margin-top: 10px;
+  }
+  .story-viewer-header .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 13px; overflow: hidden;
+  }
+  .story-viewer-header .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .story-viewer-header .name { color: #fff; font-size: 14px; font-weight: 600; }
+  .story-viewer-header .time { color: rgba(255,255,255,.7); font-size: 12px; }
+  .story-viewer-header .close { margin-right: auto; color: #fff; font-size: 26px; line-height: 1; padding: 4px 8px; }
+  .story-viewer-image { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .story-viewer-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .story-nav { position: absolute; top: 60px; bottom: 0; width: 30%; z-index: 2; cursor: pointer; }
+  .story-nav.prev { right: 0; }
+  .story-nav.next { left: 0; }
+  .story-viewer-body { padding: 12px 20px 24px; display: flex; align-items: center; gap: 10px; z-index: 3; }
+  .story-viewer-body input {
+    flex: 1; background: transparent; border: 1px solid rgba(255,255,255,.5);
+    border-radius: 22px; padding: 10px 16px; color: #fff; font-size: 14px;
+  }
+  .story-viewer-body input::placeholder { color: rgba(255,255,255,.6); }
+  .story-viewer-body input:focus { outline: none; border-color: #fff; }
+
+  /* ===== STORY UPLOAD ===== */
+  .story-upload-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 400;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .story-upload-modal.show { display: flex !important; }
+  .story-upload-card { background: var(--card); border-radius: 14px; padding: 20px; width: 100%; max-width: 400px; }
+  .story-upload-card h3 { font-size: 16px; margin-bottom: 14px; text-align: center; font-weight: 600; }
+  .story-upload-card .drop {
+    display: block; text-align: center; padding: 30px 20px;
+    border: 2px dashed var(--border); border-radius: 10px;
+    color: var(--text-secondary); cursor: pointer; margin-bottom: 12px; font-size: 14px;
+  }
+  .story-upload-card .drop:hover { border-color: var(--blue); color: var(--blue); }
+  .story-upload-card #storyPreview {
+    width: 100%; max-height: 320px; object-fit: contain;
+    border-radius: 8px; margin-bottom: 12px; display: none; background: #000;
+  }
+  .story-upload-card .row { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* ===== MODAL ===== */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,.65);
+    z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-backdrop.show { display: flex !important; }
+  .modal {
+    background: var(--card); border-radius: 12px; width: 100%;
+    max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-header { padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 600; text-align: center; position: relative; }
+  .modal-header .close { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--text); }
+  .modal-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .modal-comment { padding: 8px 16px; font-size: 14px; line-height: 1.4; display: flex; gap: 8px; }
+  .modal-comment .avatar-sm {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0; overflow: hidden;
+  }
+  .modal-comment .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-comment b { font-weight: 600; margin-left: 6px; }
+  .modal-empty { padding: 40px 20px; text-align: center; color: var(--text-secondary); font-size: 14px; }
+  .modal-footer { border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 10px; align-items: center; }
+  .modal-footer input { flex: 1; border: none; background: transparent; color: var(--text); font-size: 14px; padding: 4px; }
+  .modal-footer input:focus { outline: none; }
+  .modal-footer button { color: var(--blue); font-weight: 600; font-size: 14px; }
+  .modal-footer button:disabled { color: #b3dffc; cursor: default; }
+
+  /* ===== MESSAGES ===== */
+  .messages-page { padding-bottom: 80px; }
+  .conv-list { max-width: 630px; margin: 0 auto; }
+  .conv-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    cursor: pointer; border-bottom: 1px solid var(--border-light);
+  }
+  .conv-item:hover { background: var(--hover); }
+  .conv-item .avatar {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 18px; flex-shrink: 0; overflow: hidden;
+  }
+  .conv-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .conv-item .info { flex: 1; min-width: 0; }
+  .conv-item .info .name { font-weight: 600; font-size: 14px; }
+  .conv-item .info .last { font-size: 12px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ===== CHAT ===== */
+  .chat-page {
+    flex-direction: column;
+    height: calc(100vh - 108px);
+    max-width: 630px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .chat-header {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--card); flex-shrink: 0;
+  }
+  .chat-header .back { font-size: 22px; padding: 4px 8px; cursor: pointer; }
+  .chat-header .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 14px; overflow: hidden;
+  }
+  .chat-header .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .chat-header .name { font-weight: 600; font-size: 14px; }
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .msg { max-width: 70%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+  .msg.me { background: var(--blue); color: #fff; align-self: flex-start; border-bottom-right-radius: 4px; }
+  .msg.other { background: var(--hover); color: var(--text); align-self: flex-end; border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+  .chat-input {
+    display: flex; gap: 10px; padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--card); flex-shrink: 0;
+  }
+  .chat-input input {
+    flex: 1; border: 1px solid var(--border); border-radius: 22px;
+    padding: 10px 16px; font-size: 14px; background: var(--bg); color: var(--text);
+  }
+  .chat-input input:focus { outline: none; border-color: var(--blue); }
+  .chat-input button { padding: 0 16px; color: var(--blue); font-weight: 600; font-size: 14px; }
+  .chat-input button:disabled { opacity: 0.5; }
+
+  /* ===== LOADING / TOAST ===== */
+  #loading { padding: 60px 20px; text-align: center; color: var(--text-secondary); }
+  .spinner {
+    width: 32px; height: 32px; border: 3px solid var(--border);
+    border-top-color: var(--text-secondary); border-radius: 50%;
+    margin: 0 auto 12px; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #toast {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #262626; color: #fff; padding: 12px 22px; border-radius: 8px;
+    font-size: 14px; opacity: 0; transition: opacity .25s, transform .25s;
+    pointer-events: none; z-index: 999; max-width: 90%; text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast-error { background: #ed4956; }
+
+  /* ===== EDIT PROFILE MODAL ===== */
+  .edit-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 300;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .edit-modal.show { display: flex !important; }
+  .edit-card {
+    background: var(--card); border-radius: 14px; padding: 20px;
+    width: 100%; max-width: 420px;
+  }
+  .edit-card h3 { font-size: 16px; margin-bottom: 16px; text-align: center; font-weight: 600; }
+  .edit-card label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; margin-top: 10px; }
+  .edit-card input, .edit-card textarea {
+    width: 100%; padding: 10px 12px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; color: var(--text); font-family: inherit;
+  }
+  .edit-card input:focus, .edit-card textarea:focus { outline: none; border-color: var(--blue); }
+  .edit-card textarea { resize: none; min-height: 60px; }
+  .edit-card .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  در حال بارگذاری...
+</div>
+
+<!-- AUTH -->
+<div id="authScreen" class="auth-wrap hidden">
+  <div class="logo">MiniGram</div>
+  <div class="auth-card">
+    <div id="loginForm">
+      <input type="email" id="loginEmail" placeholder="ایمیل" autocomplete="email" />
+      <input type="password" id="loginPassword" placeholder="رمز عبور" autocomplete="current-password" />
+      <button id="loginBtn" class="btn btn-primary">ورود</button>
+      <span class="auth-switch" id="goSignup">حساب نداری؟ ثبت‌نام کن</span>
+    </div>
+    <div id="signupForm" class="hidden">
+      <input type="text" id="signupUsername" placeholder="نام کاربری (انگلیسی)" autocomplete="username" />
+      <input type="email" id="signupEmail" placeholder="ایمیل" autocomplete="email" />
+      <input type="password" id="signupPassword" placeholder="رمز عبور (حداقل ۶ کاراکتر)" autocomplete="new-password" />
+      <button id="signupBtn" class="btn btn-primary">ثبت‌نام</button>
+      <span class="auth-switch" id="goLogin">حساب داری؟ وارد شو</span>
+    </div>
+  </div>
+  <div class="auth-note">با ثبت‌نام، قوانین و سیاست حریم خصوصی ما را می‌پذیری.</div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <div class="top-bar">
+    <div class="logo">MiniGram</div>
+    <div class="actions">
+      <button id="navMessages" title="پیام‌ها">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+      </button>
+      <button id="navCreate" title="پست جدید">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <path d="M12 8v8M8 12h8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button id="navLogout" title="خروج">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="homeView" class="main">
+    <div class="stories" id="storiesBar"></div>
+    <div class="composer" id="composer">
+      <h3>پست جدید</h3>
+      <div class="media-tabs">
+        <button id="tabImage" class="active" type="button">📷 عکس</button>
+        <button id="tabVideo" type="button">🎬 ویدیو</button>
+      </div>
+      <label class="drop" for="fileInput" id="fileLabel">📷 برای انتخاب عکس کلیک کن</label>
+      <input type="file" id="fileInput" accept="image/*" class="hidden" />
+      <img id="preview" />
+      <video id="previewVideo" controls muted playsinline></video>
+      <textarea id="caption" placeholder="کپشن بنویس..." rows="2"></textarea>
+      <div class="row">
+        <button class="btn btn-secondary" id="cancelCompose">لغو</button>
+        <button class="btn btn-primary" id="postBtn" disabled>انتشار</button>
+      </div>
+    </div>
+    <div id="feed"></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div id="searchView" class="search-page main">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="جستجوی کاربر..." autocomplete="off" />
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/>
+        </svg>
+      </span>
+    </div>
+    <div class="search-section-title" id="searchSectionTitle">همه کاربران</div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- MY PROFILE -->
+  <div id="profileView" class="main profile-page">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+      <div class="profile-stats">
+        <div><div class="num" id="statPosts">0</div><div class="label">پست</div></div>
+        <div><div class="num" id="statFollowers">0</div><div class="label">فالوور</div></div>
+        <div><div class="num" id="statFollowing">0</div><div class="label">فالووینگ</div></div>
+      </div>
+    </div>
+    <div class="profile-username" id="profileUsername">@user</div>
+    <div class="profile-bio" id="profileBio">به MiniGram خوش آمدی 👋</div>
+    <div style="margin-bottom:12px;display:flex;gap:8px">
+      <button class="btn btn-secondary" id="editProfileBtn" style="flex:1;border:1px solid var(--border)">ویرایش پروفایل</button>
+    </div>
+    <div class="profile-tabs">
+      <button data-tab="posts" class="active" id="tabPostsBtn">پست‌ها</button>
+      <button data-tab="saved" id="tabSavedBtn">ذخیره‌شده</button>
+      <button data-tab="tagged" id="tabTaggedBtn">تگ‌شده</button>
+    </div>
+    <div class="grid" id="profileGrid"></div>
+  </div>
+
+  <!-- OTHER PROFILE -->
+  <div id="otherProfileView" class="main profile-page">
+    <div class="profile-header">
+      <div class="profile-avatar" id="opAvatar">U</div>
+      <div class="profile-stats">
+        <div><div class="num" id="opStatPosts">0</div><div class="label">پست</div></div>
+        <div><div class="num" id="opStatFollowers">0</div><div class="label">فالوور</div></div>
+        <div><div class="num" id="opStatFollowing">0</div><div class="label">فالووینگ</div></div>
+      </div>
+    </div>
+    <div class="profile-username" id="opUsername">@user</div>
+    <div class="profile-bio" id="opBio"></div>
+    <div class="other-profile-actions">
+      <button id="opFollowBtn" class="primary">دنبال کن</button>
+      <button id="opMessageBtn">پیام</button>
+    </div>
+    <div class="profile-tabs">
+      <button class="active">پست‌ها</button>
+    </div>
+    <div class="grid" id="opGrid"></div>
+  </div>
+
+  <!-- MESSAGES LIST -->
+  <div id="messagesView" class="messages-page main">
+    <div class="conv-list" id="convList"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chatView" class="chat-page">
+    <div class="chat-header">
+      <div class="back" id="chatBack">→</div>
+      <div class="avatar" id="chatAvatar">?</div>
+      <div class="name" id="chatName">-</div>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="پیام بنویس..." />
+      <button id="chatSendBtn" disabled>ارسال</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button data-view="home" id="navHome" class="active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2z"/></svg>
+    </button>
+    <button data-view="search" id="navSearch">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+    </button>
+    <button data-view="create" id="navCreateBottom">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8" stroke-linecap="round"/></svg>
+    </button>
+    <button data-view="reels" id="navReels">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="m3 9 4-4M21 9l-4-4M3 15h18M9 13v6l5-3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button data-view="profile" id="navProfile">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- STORY UPLOAD -->
+<div class="story-upload-modal" id="storyUploadModal">
+  <div class="story-upload-card">
+    <h3>استوری جدید</h3>
+    <label class="drop" for="storyFileInput" id="storyFileLabel">📷 انتخاب عکس</label>
+    <input type="file" id="storyFileInput" accept="image/*" class="hidden" />
+    <img id="storyPreview" />
+    <div class="row">
+      <button class="btn btn-secondary" id="storyCancelBtn">لغو</button>
+      <button class="btn btn-primary" id="storyUploadBtn" disabled>انتشار</button>
+    </div>
+  </div>
+</div>
+
+<!-- STORY VIEWER -->
+<div class="story-viewer" id="storyViewer">
+  <div class="story-nav prev" id="storyPrev"></div>
+  <div class="story-nav next" id="storyNext"></div>
+  <div class="story-progress-bar" id="storyProgressBar"></div>
+  <div class="story-viewer-header">
+    <div class="avatar" id="storyViewerAvatar">?</div>
+    <div>
+      <div class="name" id="storyViewerName">-</div>
+      <div class="time" id="storyViewerTime">-</div>
+    </div>
+    <button class="close" id="storyViewerClose">×</button>
+  </div>
+  <div class="story-viewer-image"><img id="storyViewerImage" alt="" /></div>
+  <div class="story-viewer-body">
+    <input type="text" id="storyReplyInput" placeholder="پاسخ به استوری..." />
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="edit-modal" id="editProfileModal">
+  <div class="edit-card">
+    <h3>ویرایش پروفایل</h3>
+    <label>نام کاربری</label>
+    <input type="text" id="editUsername" placeholder="username" />
+    <label>بیو</label>
+    <textarea id="editBio" placeholder="درباره خودت بنویس..."></textarea>
+    <div class="row">
+      <button class="btn btn-secondary" id="editCancelBtn">لغو</button>
+      <button class="btn btn-primary" id="editSaveBtn">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENTS MODAL -->
+<div class="modal-backdrop" id="commentsModal">
+  <div class="modal">
+    <div class="modal-header">
+      کامنت‌ها
+      <button class="close" id="closeComments">×</button>
+    </div>
+    <div class="modal-body" id="commentsList"></div>
+    <div class="modal-footer">
+      <input type="text" id="modalCommentInput" placeholder="کامنت بنویس..." />
+      <button id="modalSendBtn" disabled>ارسال</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var SUPABASE_URL = 'https://eiwxwnnymntjholvoobo.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpd3h3bm55bW50amhvbHZvb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzQ4MTgsImV4cCI6MjEwNTkxMDgxOH0.fmVCamFmnvHzTvJfVI_V9WuspqyO2xWrilID6wZCg_0';
+
+  if (!window.supabase || !window.supabase.createClient) {
+    document.getElementById('loading').innerHTML = 'خطا: کتابخانه Supabase لود نشد.';
+    return;
+  }
+
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var currentUser = null;
+  var currentProfile = null;
+  var selectedFile = null;
+  var selectedFileType = 'image';
+  var storyFile = null;
+  var activeCommentPostId = null;
+  var lastTapTime = 0;
+  var currentStoryIndex = 0;
+  var currentStoryList = [];
+  var storyTimer = null;
+  var storyPaused = false;
+  var searchTimer;
+  var activeConvId = null;
+  var chatChannel = null;
+  var currentTab = 'posts';
+  window._savedPostIds = {};
+
+  var $ = function (id) { return document.getElementById(id); };
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+  var _tt;
+  function toast(msg, isError) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'show' + (isError ? ' toast-error' : '');
+    clearTimeout(_tt);
+    _tt = setTimeout(function () { t.className = ''; }, 2800);
+  }
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+  }
+  function initialOf(n) { return (n || '?').charAt(0).toUpperCase(); }
+  function timeAgo(d) {
+    var diff = Math.floor((Date.now() - new Date(d).getTime()) / 1000);
+    if (diff < 60) return 'همین الان';
+    if (diff < 3600) return Math.floor(diff / 60) + ' دقیقه پیش';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' ساعت پیش';
+    if (diff < 604800) return Math.floor(diff / 86400) + ' روز پیش';
+    return Math.floor(diff / 604800) + ' هفته پیش';
+  }
+  function faNum(n) { return Number(n || 0).toLocaleString('fa-IR'); }
+
+  // ===== AUTH =====
+  $('goSignup').onclick = function () { hide('loginForm'); show('signupForm'); };
+  $('goLogin').onclick = function () { hide('signupForm'); show('loginForm'); };
+
+  $('signupBtn').onclick = async function () {
+    var username = $('signupUsername').value.trim();
+    var email = $('signupEmail').value.trim();
+    var password = $('signupPassword').value;
+    if (!username || !email || !password) return toast('همه فیلدها رو پر کن', true);
+    if (password.length < 6) return toast('رمز عبور حداقل ۶ کاراکتر', true);
+    if (!/^[a-zA-Z0-9_.]+$/.test(username)) return toast('نام کاربری فقط انگلیسی، عدد و _', true);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('ایمیل معتبر نیست', true);
+
+    var btn = $('signupBtn');
+    btn.disabled = true; btn.textContent = 'در حال ثبت...';
+    try {
+      var res = await sb.auth.signUp({
+        email: email, password: password,
+        options: { data: { username: username } }
+      });
+      if (res.error) { console.error(res.error); toast('خطا: ' + res.error.message, true); }
+      else if (res.data.user && !res.data.session) toast('ثبت‌نام شد. ایمیلت رو تایید کن.');
+      else toast('خوش آمدی!');
+    } catch (e) { console.error(e); toast('خطای غیرمنتظره', true); }
+    finally { btn.disabled = false; btn.textContent = 'ثبت‌نام'; }
+  };
+
+  $('loginBtn').onclick = async function () {
+    var email = $('loginEmail').value.trim();
+    var password = $('loginPassword').value;
+    if (!email || !password) return toast('همه فیلدها رو پر کن', true);
+    var btn = $('loginBtn');
+    btn.disabled = true; btn.textContent = 'در حال ورود...';
+    try {
+      var res = await sb.auth.signInWithPassword({ email: email, password: password });
+      if (res.error) { console.error(res.error); toast('خطا: ' + res.error.message, true); }
+      else toast('خوش آمدی!');
+    } catch (e) { console.error(e); toast('خطای غیرمنتظره', true); }
+    finally { btn.disabled = false; btn.textContent = 'ورود'; }
+  };
+
+  $('navLogout').onclick = async function () {
+    if (!confirm('خارج می‌شی؟')) return;
+    await sb.auth.signOut();
+    location.reload();
+  };
+
+  // ===== AUTH STATE =====
+  sb.auth.onAuthStateChange(function (event, session) {
+    if (session && session.user) {
+      currentUser = session.user;
+      hide('loading'); hide('authScreen'); show('app');
+      loadProfile().then(function () {
+        loadFeed();
+        buildStories();
+        loadCurrentTab();
+      });
+    } else {
+      currentUser = null; currentProfile = null;
+      hide('loading'); show('authScreen'); hide('app');
+    }
+  });
+
+  // ===== PROFILE =====
+  async function loadProfile() {
+    try {
+      var res = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+      if (!res.data) {
+        var uname = (currentUser.user_metadata && currentUser.user_metadata.username) || 'user_' + currentUser.id.substr(0, 8);
+        await sb.from('profiles').insert({ id: currentUser.id, username: uname });
+        var res2 = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+        currentProfile = res2.data;
+      } else {
+        currentProfile = res.data;
+      }
+      var uname = currentProfile.username || 'کاربر';
+      $('profileUsername').textContent = '@' + uname;
+      $('profileBio').textContent = currentProfile.bio || 'به MiniGram خوش آمدی 👋';
+      renderProfileAvatar();
+
+      var p = await sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+      $('statPosts').textContent = faNum(p.count);
+      var f1 = await sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', currentUser.id);
+      $('statFollowers').textContent = faNum(f1.count);
+      var f2 = await sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', currentUser.id);
+      $('statFollowing').textContent = faNum(f2.count);
+    } catch (e) { console.error(e); }
+  }
+
+  function renderProfileAvatar() {
+    var el = $('profileAvatar');
+    var uname = (currentProfile && currentProfile.username) || 'کاربر';
+    var url = currentProfile && currentProfile.avatar_url;
+    if (url) el.innerHTML = '<img src="' + esc(url) + '" /><div class="edit-badge">+</div>';
+    else el.innerHTML = '<span>' + esc(initialOf(uname)) + '</span><div class="edit-badge">+</div>';
+  }
+
+  $('profileAvatar').onclick = function () {
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    inp.onchange = async function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var el = $('profileAvatar');
+      el.innerHTML = '<div class="spinner" style="margin:25px auto"></div>';
+      try {
+        var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        var cleanPath = currentUser.id + '/avatar.' + ext;
+        var up = await sb.storage.from('avatars').upload(cleanPath, file, { cacheControl: '3600', upsert: true });
+        if (up.error) throw up.error;
+        var urlRes = sb.storage.from('avatars').getPublicUrl(cleanPath);
+        var publicUrl = urlRes.data.publicUrl + '?v=' + Date.now();
+        var upd = await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+        if (upd.error) throw upd.error;
+        currentProfile.avatar_url = publicUrl;
+        renderProfileAvatar();
+        toast('عکس پروفایل آپدیت شد!');
+        loadFeed();
+      } catch (err) {
+        console.error(err);
+        toast('خطا: ' + err.message, true);
+        renderProfileAvatar();
+      }
+    };
+    inp.click();
+  };
+
+  // ===== EDIT PROFILE =====
+  $('editProfileBtn').onclick = function () {
+    $('editUsername').value = (currentProfile && currentProfile.username) || '';
+    $('editBio').value = (currentProfile && currentProfile.bio) || '';
+    $('editProfileModal').classList.add('show');
+  };
+  $('editCancelBtn').onclick = function () { $('editProfileModal').classList.remove('show'); };
+  $('editProfileModal').onclick = function (e) {
+    if (e.target.id === 'editProfileModal') $('editCancelBtn').click();
+  };
+  $('editSaveBtn').onclick = async function () {
+    var uname = $('editUsername').value.trim();
+    var bio = $('editBio').value.trim();
+    if (!uname) return toast('نام کاربری رو پر کن', true);
+    if (!/^[a-zA-Z0-9_.]+$/.test(uname)) return toast('نام کاربری فقط انگلیسی، عدد و _', true);
+
+    var btn = $('editSaveBtn');
+    btn.disabled = true; btn.textContent = 'در حال ذخیره...';
+    try {
+      var upd = await sb.from('profiles').update({ username: uname, bio: bio }).eq('id', currentUser.id);
+      if (upd.error) throw upd.error;
+      currentProfile.username = uname;
+      currentProfile.bio = bio;
+      $('profileUsername').textContent = '@' + uname;
+      $('profileBio').textContent = bio || 'به MiniGram خوش آمدی 👋';
+      toast('ذخیره شد!');
+      $('editProfileModal').classList.remove('show');
+      loadFeed();
+    } catch (e) {
+      console.error(e);
+      toast('خطا: ' + e.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'ذخیره';
+    }
+  };
+
+  // ===== NAVIGATION =====
+  function switchView(view) {
+    hide('homeView'); hide('profileView'); hide('searchView');
+    hide('otherProfileView'); hide('messagesView'); hide('chatView');
+    document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
+
+    if (view === 'home') { show('homeView'); $('navHome').classList.add('active'); }
+    else if (view === 'search') { show('searchView'); $('navSearch').classList.add('active'); loadSearchUsers(''); }
+    else if (view === 'profile') {
+      show('profileView'); $('navProfile').classList.add('active');
+      loadProfile(); loadCurrentTab();
+    }
+  }
+
+  document.querySelectorAll('.bottom-nav button').forEach(function (btn) {
+    btn.onclick = function () {
+      var view = btn.dataset.view;
+      if (view === 'create') return toggleComposer();
+      if (view === 'reels') return toast('به‌زودی...');
+      if (view === 'home' || view === 'search' || view === 'profile') switchView(view);
+    };
+  });
+
+  $('navCreate').onclick = function () { switchView('home'); toggleComposer(); };
+
+  function toggleComposer() {
+    var c = $('composer');
+    if (c.classList.contains('show')) { c.classList.remove('show'); resetComposer(); }
+    else { c.classList.add('show'); c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+  $('cancelCompose').onclick = function () { $('composer').classList.remove('show'); resetComposer(); };
+  function resetComposer() {
+    selectedFile = null;
+    selectedFileType = 'image';
+    $('fileInput').value = '';
+    $('fileInput').setAttribute('accept', 'image/*');
+    $('preview').style.display = 'none';
+    $('previewVideo').style.display = 'none';
+    $('caption').value = '';
+    $('fileLabel').textContent = '📷 برای انتخاب عکس کلیک کن';
+    $('postBtn').disabled = true;
+    $('tabImage').classList.add('active');
+    $('tabVideo').classList.remove('active');
+  }
+
+  // ===== MEDIA TABS =====
+  $('tabImage').onclick = function () {
+    selectedFileType = 'image';
+    $('tabImage').classList.add('active');
+    $('tabVideo').classList.remove('active');
+    $('fileInput').setAttribute('accept', 'image/*');
+    $('fileLabel').textContent = '📷 برای انتخاب عکس کلیک کن';
+    $('preview').style.display = 'none';
+    $('previewVideo').style.display = 'none';
+    selectedFile = null;
+    $('postBtn').disabled = true;
+  };
+  $('tabVideo').onclick = function () {
+    selectedFileType = 'video';
+    $('tabVideo').classList.add('active');
+    $('tabImage').classList.remove('active');
+    $('fileInput').setAttribute('accept', 'video/*');
+    $('fileLabel').textContent = '🎬 برای انتخاب ویدیو کلیک کن';
+    $('preview').style.display = 'none';
+    $('previewVideo').style.display = 'none';
+    selectedFile = null;
+    $('postBtn').disabled = true;
+  };
+
+  // ===== STORIES =====
+  async function buildStories() {
+    var bar = $('storiesBar');
+    var uname = (currentProfile && currentProfile.username) || 'کاربر';
+    var myAv = currentProfile && currentProfile.avatar_url;
+    var myInner = myAv
+      ? '<img src="' + esc(myAv) + '" />'
+      : '<div class="letter">' + esc(initialOf(uname)) + '</div>';
+
+    bar.innerHTML = '<div class="story" data-story-self="1">' +
+      '<div class="story-avatar self"><div class="story-avatar-inner">' + myInner + '</div></div>' +
+      '<div class="story-name">استوری تو</div>' +
+    '</div><div class="spinner" style="margin:20px;width:24px;height:24px;flex-shrink:0"></div>';
+
+    try {
+      var res = await sb.from('stories')
+        .select('id, user_id, media_url, created_at, profiles(username, avatar_url)')
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false })
+        .limit(80);
+      if (res.error) throw res.error;
+
+      var grouped = {};
+      (res.data || []).forEach(function (s) {
+        if (!grouped[s.user_id]) {
+          grouped[s.user_id] = {
+            userId: s.user_id,
+            username: (s.profiles && s.profiles.username) || 'کاربر',
+            avatar_url: s.profiles && s.profiles.avatar_url
+          };
+        }
+      });
+
+      var sp = bar.querySelector('.spinner'); if (sp) sp.remove();
+
+      Object.keys(grouped).forEach(function (uid) {
+        if (uid === currentUser.id) return;
+        var g = grouped[uid];
+        var inner = g.avatar_url
+          ? '<img src="' + esc(g.avatar_url) + '" />'
+          : '<div class="letter">' + esc(initialOf(g.username)) + '</div>';
+        var el = document.createElement('div');
+        el.className = 'story';
+        el.innerHTML =
+          '<div class="story-avatar"><div class="story-avatar-inner">' + inner + '</div></div>' +
+          '<div class="story-name">' + esc(g.username) + '</div>';
+        el.onclick = function () { openStoryViewer(g.userId); };
+        bar.appendChild(el);
+      });
+
+      var selfEl = bar.querySelector('[data-story-self]');
+      if (grouped[currentUser.id]) {
+        selfEl.querySelector('.story-avatar').classList.remove('self');
+        selfEl.onclick = function () { openStoryViewer(currentUser.id); };
+      } else {
+        selfEl.onclick = function () { openStoryUpload(); };
+      }
+    } catch (e) { console.error('stories', e); var sp2 = bar.querySelector('.spinner'); if (sp2) sp2.remove(); }
+  }
+
+  function openStoryUpload() {
+    storyFile = null;
+    $('storyFileInput').value = '';
+    $('storyPreview').style.display = 'none';
+    $('storyFileLabel').textContent = '📷 انتخاب عکس';
+    $('storyUploadBtn').disabled = true;
+    $('storyUploadModal').classList.add('show');
+  }
+  $('storyCancelBtn').onclick = function () { $('storyUploadModal').classList.remove('show'); };
+  $('storyUploadModal').onclick = function (e) { if (e.target.id === 'storyUploadModal') $('storyCancelBtn').click(); };
+  $('storyFileInput').onchange = function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    storyFile = file;
+    var r = new FileReader();
+    r.onload = function (ev) {
+      $('storyPreview').src = ev.target.result;
+      $('storyPreview').style.display = 'block';
+      $('storyFileLabel').textContent = '✅ ' + file.name;
+      $('storyUploadBtn').disabled = false;
+    };
+    r.readAsDataURL(file);
+  };
+  $('storyUploadBtn').onclick = async function () {
+    if (!storyFile) return;
+    var btn = $('storyUploadBtn');
+    btn.disabled = true; btn.textContent = 'در حال آپلود...';
+    try {
+      var ext = (storyFile.name.split('.').pop() || 'jpg').toLowerCase();
+      var path = currentUser.id + '/' + Date.now() + '.' + ext;
+      var up = await sb.storage.from('stories').upload(path, storyFile, { cacheControl: '3600', upsert: false });
+      if (up.error) throw up.error;
+      var urlRes = sb.storage.from('stories').getPublicUrl(path);
+      var ins = await sb.from('stories').insert({ user_id: currentUser.id, media_url: urlRes.data.publicUrl, media_type: 'image' });
+      if (ins.error) throw ins.error;
+      toast('استوری منتشر شد!');
+      $('storyUploadModal').classList.remove('show');
+      buildStories();
+    } catch (e) { console.error(e); toast('خطا: ' + e.message, true); }
+    finally { btn.disabled = false; btn.textContent = 'انتشار'; }
+  };
+
+  async function openStoryViewer(userId) {
+    currentStoryIndex = 0;
+    try {
+      var res = await sb.from('stories')
+        .select('id, media_url, created_at, profiles(username, avatar_url)')
+        .eq('user_id', userId)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: true });
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) return toast('استوری‌ای وجود نداره');
+      currentStoryList = res.data;
+      $('storyViewer').classList.add('show');
+      renderCurrentStory();
+    } catch (e) { console.error(e); toast('خطا', true); }
+  }
+
+  function renderCurrentStory() {
+    clearTimeout(storyTimer);
+    var s = currentStoryList[currentStoryIndex];
+    if (!s) return closeStoryViewer();
+    var uname = (s.profiles && s.profiles.username) || 'کاربر';
+    $('storyViewerImage').src = s.media_url;
+    $('storyViewerName').textContent = uname;
+    var av = $('storyViewerAvatar');
+    if (s.profiles && s.profiles.avatar_url) av.innerHTML = '<img src="' + esc(s.profiles.avatar_url) + '" />';
+    else av.textContent = initialOf(uname);
+    $('storyViewerTime').textContent = timeAgo(s.created_at);
+    $('storyReplyInput').value = '';
+
+    var html = '';
+    currentStoryList.forEach(function (_, i) {
+      var cls = i < currentStoryIndex ? 'done' : (i === currentStoryIndex ? 'active' : '');
+      html += '<div class="story-progress-seg ' + cls + '"><div class="fill"></div></div>';
+    });
+    $('storyProgressBar').innerHTML = html;
+    storyTimer = setTimeout(nextStory, 5000);
+  }
+  function nextStory() {
+    if (currentStoryIndex < currentStoryList.length - 1) { currentStoryIndex++; renderCurrentStory(); }
+    else closeStoryViewer();
+  }
+  function prevStory() {
+    if (currentStoryIndex > 0) { currentStoryIndex--; renderCurrentStory(); }
+    else renderCurrentStory();
+  }
+  function closeStoryViewer() {
+    clearTimeout(storyTimer);
+    $('storyViewer').classList.remove('show');
+    currentStoryList = []; currentStoryIndex = 0;
+  }
+  $('storyNext').onclick = nextStory;
+  $('storyPrev').onclick = prevStory;
+  $('storyViewerClose').onclick = closeStoryViewer;
+  $('storyReplyInput').onkeydown = function (e) {
+    if (e.key === 'Enter' && this.value.trim()) { toast('پاسخ ثبت شد'); this.value = ''; }
+  };
+  var storyImg = $('storyViewerImage');
+  storyImg.addEventListener('mousedown', function () { storyPaused = true; clearTimeout(storyTimer); });
+  storyImg.addEventListener('mouseup', function () { if (storyPaused) { storyPaused = false; storyTimer = setTimeout(nextStory, 2000); } });
+  storyImg.addEventListener('touchstart', function () { storyPaused = true; clearTimeout(storyTimer); });
+  storyImg.addEventListener('touchend', function () { if (storyPaused) { storyPaused = false; storyTimer = setTimeout(nextStory, 2000); } });
+
+  // ===== SEARCH =====
+  $('searchInput').oninput = function () {
+    clearTimeout(searchTimer);
+    var q = this.value.trim();
+    searchTimer = setTimeout(function () { loadSearchUsers(q); }, 300);
+  };
+
+  async function loadSearchUsers(query) {
+    var results = $('searchResults');
+    results.innerHTML = '<div class="spinner" style="margin:30px auto"></div>';
+    $('searchSectionTitle').textContent = query ? 'نتایج جستجو' : 'همه کاربران';
+    try {
+      var q = sb.from('profiles').select('id, username, avatar_url').limit(50);
+      if (query) q = q.ilike('username', '%' + query + '%');
+      else q = q.neq('id', currentUser.id);
+      var res = await q;
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) {
+        results.innerHTML = '<div class="search-empty">کاربری پیدا نشد 🔍</div>';
+        return;
+      }
+      var f = await sb.from('follows').select('following_id').eq('follower_id', currentUser.id);
+      var followingIds = (f.data || []).map(function (x) { return x.following_id; });
+
+      results.innerHTML = res.data.map(function (u) {
+        var isMe = u.id === currentUser.id;
+        var isFollowing = followingIds.indexOf(u.id) !== -1;
+        var btn = isMe
+          ? '<span style="font-size:12px;color:var(--text-secondary)">خودت</span>'
+          : '<button class="follow-btn ' + (isFollowing ? 'following' : '') + '" data-follow="' + u.id + '" data-following="' + isFollowing + '">' + (isFollowing ? 'دنبال می‌کنی' : 'دنبال کن') + '</button>';
+        var av = u.avatar_url ? '<img src="' + esc(u.avatar_url) + '" />' : esc(initialOf(u.username));
+        return '<div class="search-user" data-open-user="' + u.id + '">' +
+          '<div class="avatar">' + av + '</div>' +
+          '<div class="info"><div class="name">' + esc(u.username) + '</div><div class="sub">@' + esc(u.username) + '</div></div>' +
+          btn +
+        '</div>';
+      }).join('');
+
+      results.querySelectorAll('[data-follow]').forEach(function (b) {
+        b.onclick = function (e) { e.stopPropagation(); toggleFollow(b); };
+      });
+      results.querySelectorAll('[data-open-user]').forEach(function (el) {
+        el.onclick = function () { openUserProfile(el.dataset.openUser); };
+      });
+    } catch (e) { console.error(e); results.innerHTML = '<div class="search-empty">خطا</div>'; }
+  }
+
+  async function toggleFollow(btn) {
+    var id = btn.dataset.follow;
+    var following = btn.dataset.following === 'true';
+    btn.disabled = true;
+    try {
+      if (following) {
+        await sb.from('follows').delete().eq('follower_id', currentUser.id).eq('following_id', id);
+        btn.textContent = 'دنبال کن'; btn.classList.remove('following'); btn.dataset.following = 'false';
+      } else {
+        await sb.from('follows').insert({ follower_id: currentUser.id, following_id: id });
+        btn.textContent = 'دنبال می‌کنی'; btn.classList.add('following'); btn.dataset.following = 'true';
+      }
+    } catch (e) { toast('خطا', true); }
+    finally { btn.disabled = false; }
+  }
+
+  // ===== OTHER PROFILE =====
+  async function openUserProfile(userId) {
+    if (userId === currentUser.id) return switchView('profile');
+    hide('homeView'); hide('searchView'); hide('profileView'); hide('messagesView'); hide('chatView');
+    show('otherProfileView');
+
+    var pRes = await sb.from('profiles').select('*').eq('id', userId).single();
+    var other = pRes.data || { username: 'کاربر' };
+    $('opUsername').textContent = '@' + other.username;
+    $('opBio').textContent = other.bio || '';
+
+    var av = $('opAvatar');
+    if (other.avatar_url) av.innerHTML = '<img src="' + esc(other.avatar_url) + '" />';
+    else av.textContent = initialOf(other.username);
+
+    var results = await Promise.all([
+      sb.from('posts').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', userId),
+      sb.from('follows').select('id', { count: 'exact', head: true }).eq('follower_id', userId),
+      sb.from('follows').select('id').eq('follower_id', currentUser.id).eq('following_id', userId).maybeSingle(),
+      sb.from('follows').select('id').eq('follower_id', userId).eq('following_id', currentUser.id).maybeSingle()
+    ]);
+    $('opStatPosts').textContent = faNum(results[0].count);
+    $('opStatFollowers').textContent = faNum(results[1].count);
+    $('opStatFollowing').textContent = faNum(results[2].count);
+
+    var isFollowing = !!results[3].data;
+    var followsMe = !!results[4].data;
+    var btn = $('opFollowBtn');
+    btn.dataset.userId = userId;
+    btn.dataset.following = isFollowing;
+    if (isFollowing) {
+      btn.textContent = followsMe ? 'دنبال می‌کنی (متقابل)' : 'دنبال می‌کنی';
+      btn.classList.add('following');
+    } else {
+      btn.textContent = followsMe ? 'دنبالش کن (دنبالت می‌کنه)' : 'دنبال کن';
+      btn.classList.remove('following');
+    }
+    loadOtherGrid(userId);
+  }
+
+  async function loadOtherGrid(userId) {
+    var grid = $('opGrid');
+    grid.innerHTML = '<div class="spinner" style="grid-column:1/-1;margin:30px auto"></div>';
+    var res = await sb.from('posts').select('id, image_url, media_type').eq('user_id', userId).order('created_at', { ascending: false });
+    if (!res.data || res.data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">هنوز پستی نداره</div>';
+      return;
+    }
+    grid.innerHTML = res.data.map(function (p) {
+      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
+    }).join('');
+  }
+
+  $('opFollowBtn').onclick = async function () {
+    var btn = this;
+    var id = btn.dataset.userId;
+    if (!id) return;
+    btn.disabled = true;
+    try {
+      var following = btn.dataset.following === 'true';
+      if (following) {
+        await sb.from('follows').delete().eq('follower_id', currentUser.id).eq('following_id', id);
+        btn.textContent = 'دنبال کن'; btn.classList.remove('following'); btn.dataset.following = 'false';
+      } else {
+        await sb.from('follows').insert({ follower_id: currentUser.id, following_id: id });
+        btn.textContent = 'دنبال می‌کنی'; btn.classList.add('following'); btn.dataset.following = 'true';
+      }
+      var c = await sb.from('follows').select('id', { count: 'exact', head: true }).eq('following_id', id);
+      $('opStatFollowers').textContent = faNum(c.count);
+    } catch (e) { toast('خطا', true); }
+    finally { btn.disabled = false; }
+  };
+
+  // ===== COMPOSER =====
+  $('fileInput').onchange = function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+
+    if (selectedFileType === 'image' && !file.type.startsWith('image/')) {
+      return toast('لطفاً یه عکس انتخاب کن', true);
+    }
+    if (selectedFileType === 'video' && !file.type.startsWith('video/')) {
+      return toast('لطفاً یه ویدیو انتخاب کن', true);
+    }
+    if (selectedFileType === 'video' && file.size > 50 * 1024 * 1024) {
+      return toast('حجم ویدیو بیشتر از ۵۰ مگابایته', true);
+    }
+
+    selectedFile = file;
+    var url = URL.createObjectURL(file);
+
+    if (selectedFileType === 'image') {
+      $('preview').src = url;
+      $('preview').style.display = 'block';
+      $('previewVideo').style.display = 'none';
+      $('fileLabel').textContent = '✅ ' + file.name;
+    } else {
+      $('previewVideo').src = url;
+      $('previewVideo').style.display = 'block';
+      $('preview').style.display = 'none';
+      $('fileLabel').textContent = '✅ ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(1) + ' MB)';
+    }
+    $('postBtn').disabled = false;
+  };
+
+  $('postBtn').onclick = async function () {
+    if (!selectedFile) return toast('اول یه فایل انتخاب کن', true);
+    var btn = $('postBtn');
+    btn.disabled = true; btn.textContent = 'در حال آپلود...';
+    try {
+      var ext = (selectedFile.name.split('.').pop() || (selectedFileType === 'video' ? 'mp4' : 'jpg')).toLowerCase();
+      var path = currentUser.id + '/' + Date.now() + '.' + ext;
+      var up = await sb.storage.from('posts').upload(path, selectedFile, { cacheControl: '31536000', upsert: false });
+      if (up.error) throw up.error;
+      var urlRes = sb.storage.from('posts').getPublicUrl(path);
+      var ins = await sb.from('posts').insert({
+        user_id: currentUser.id,
+        image_url: urlRes.data.publicUrl,
+        caption: $('caption').value.trim(),
+        media_type: selectedFileType
+      });
+      if (ins.error) throw ins.error;
+      toast('پست منتشر شد!');
+      $('composer').classList.remove('show');
+      resetComposer();
+      loadFeed();
+      loadCurrentTab();
+    } catch (e) { console.error(e); toast('خطا: ' + e.message, true); }
+    finally { btn.disabled = false; btn.textContent = 'انتشار'; }
+  };
+
+  // ===== FEED =====
+  async function loadFeed() {
+    var feed = $('feed');
+    feed.innerHTML = '<div class="spinner" style="margin:30px auto"></div>';
+    try {
+      var res = await sb.from('posts')
+        .select('id, image_url, caption, created_at, user_id, media_type, profiles(username, avatar_url)')
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) {
+        feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">هنوز پستی نیست. اولین پست رو تو بذار!</div>';
+        return;
+      }
+      var ids = res.data.map(function (p) { return p.id; });
+      var results = await Promise.all([
+        sb.from('likes').select('post_id, user_id').in('post_id', ids),
+        sb.from('comments').select('id, post_id, body, created_at, profiles(username, avatar_url)').in('post_id', ids).order('created_at'),
+        sb.from('saves').select('post_id').eq('user_id', currentUser.id).in('post_id', ids)
+      ]);
+      var likes = results[0].data || [];
+      var comments = results[1].data || [];
+      var saves = results[2].data || [];
+
+      window._savedPostIds = {};
+      saves.forEach(function (s) { window._savedPostIds[s.post_id] = true; });
+
+      feed.innerHTML = '';
+      res.data.forEach(function (p) { feed.appendChild(renderPost(p, likes, comments)); });
+    } catch (e) {
+      console.error(e);
+      feed.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">خطا</div>';
+    }
+  }
+
+  function renderPost(post, likes, comments) {
+    var pLikes = likes.filter(function (l) { return l.post_id === post.id; });
+    var liked = pLikes.some(function (l) { return l.user_id === currentUser.id; });
+    var pComments = comments.filter(function (c) { return c.post_id === post.id; });
+    var uname = (post.profiles && post.profiles.username) || 'کاربر';
+    var avUrl = post.profiles && post.profiles.avatar_url;
+    var isSaved = !!window._savedPostIds[post.id];
+
+    var el = document.createElement('div');
+    el.className = 'post';
+    el.dataset.postId = post.id;
+    el.dataset.userId = post.user_id;
+
+    var avHtml = avUrl
+      ? '<div class="post-avatar"><img src="' + esc(avUrl) + '" /></div>'
+      : '<div class="post-avatar">' + esc(initialOf(uname)) + '</div>';
+
+    var commentsLink = pComments.length > 0
+      ? '<div class="post-comments-link" data-view-comments="' + post.id + '">مشاهده هر ' + faNum(pComments.length) + ' کامنت</div>' : '';
+
+    var mediaHtml = post.media_type === 'video'
+      ? '<video src="' + esc(post.image_url) + '" controls playsinline preload="metadata"></video><div class="video-badge">🎬 ویدیو</div>'
+      : '<img src="' + esc(post.image_url) + '" loading="lazy" />';
+
+    el.innerHTML =
+      '<div class="post-header">' + avHtml +
+        '<div class="post-username">' + esc(uname) + '</div>' +
+        '<div class="post-more">···</div>' +
+      '</div>' +
+      '<div class="post-image-wrap">' + mediaHtml +
+        '<div class="heart-burst">❤️</div>' +
+      '</div>' +
+      '<div class="post-actions">' +
+        '<button data-like="' + post.id + '" class="' + (liked ? 'liked' : '') + '">' +
+          '<svg viewBox="0 0 24 24" fill="' + (liked ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2">' +
+            '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' +
+          '</svg>' +
+        '</button>' +
+        '<button data-comment="' + post.id + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+            '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>' +
+          '</svg>' +
+        '</button>' +
+        '<button class="save-btn" data-save="' + post.id + '" title="ذخیره">' +
+          '<svg viewBox="0 0 24 24" fill="' + (isSaved ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2">' +
+            '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>' +
+          '</svg>' +
+        '</button>' +
+      '</div>' +
+      '<div class="post-likes" data-likes-count="' + post.id + '">' +
+        (pLikes.length > 0 ? faNum(pLikes.length) + ' لایک' : 'اولین لایک رو تو بکن') +
+      '</div>' +
+      (post.caption ? '<div class="post-caption"><b>' + esc(uname) + '</b>' + esc(post.caption) + '</div>' : '') +
+      commentsLink +
+      '<div class="post-time">' + esc(timeAgo(post.created_at)) + '</div>';
+
+    var imageWrap = el.querySelector('.post-image-wrap');
+    var heartBurst = el.querySelector('.heart-burst');
+    var likeBtn = el.querySelector('[data-like]');
+    var saveBtn = el.querySelector('[data-save]');
+
+    imageWrap.addEventListener('click', function (e) {
+      // اگه روی ویدیو کلیک شد، دابل‌تپ رو نادیده بگیر
+      if (e.target.tagName === 'VIDEO') return;
+      var now = Date.now();
+      if (now - lastTapTime < 300) {
+        if (!likeBtn.classList.contains('liked')) {
+          likeBtn.classList.add('liked');
+          likeBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+          heartBurst.classList.add('show');
+          setTimeout(function () { heartBurst.classList.remove('show'); }, 900);
+          doLike(post.id, true, el);
+        }
+        lastTapTime = 0;
+      } else lastTapTime = now;
+    });
+
+    likeBtn.onclick = function () {
+      var isLiked = likeBtn.classList.contains('liked');
+      if (isLiked) {
+        likeBtn.classList.remove('liked');
+        likeBtn.querySelector('svg').setAttribute('fill', 'none');
+        doLike(post.id, false, el);
+      } else {
+        likeBtn.classList.add('liked');
+        likeBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+        doLike(post.id, true, el);
+      }
+    };
+
+    saveBtn.onclick = function (e) {
+      e.stopPropagation();
+      toggleSave(post.id, saveBtn);
+    };
+
+    el.querySelector('[data-comment]').onclick = function () { openComments(post.id); };
+    if (commentsLink) el.querySelector('[data-view-comments]').onclick = function () { openComments(post.id); };
+
+    el.querySelector('.post-username').onclick = function () { openUserProfile(post.user_id); };
+    el.querySelector('.post-avatar').onclick = function () { openUserProfile(post.user_id); };
+
+    return el;
+  }
+
+  async function doLike(postId, like, el) {
+    try {
+      if (like) await sb.from('likes').insert({ post_id: postId, user_id: currentUser.id });
+      else await sb.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+      var c = await sb.from('likes').select('id', { count: 'exact', head: true }).eq('post_id', postId);
+      var counter = el.querySelector('[data-likes-count]');
+      if (counter) counter.textContent = c.count > 0 ? faNum(c.count) + ' لایک' : 'اولین لایک رو تو بکن';
+    } catch (e) { console.error(e); }
+  }
+
+  async function toggleSave(postId, btn) {
+    var saved = !!window._savedPostIds[postId];
+    try {
+      if (saved) {
+        await sb.from('saves').delete().eq('user_id', currentUser.id).eq('post_id', postId);
+        delete window._savedPostIds[postId];
+        btn.querySelector('svg').setAttribute('fill', 'none');
+        toast('از ذخیره‌ها حذف شد');
+      } else {
+        await sb.from('saves').insert({ user_id: currentUser.id, post_id: postId });
+        window._savedPostIds[postId] = true;
+        btn.querySelector('svg').setAttribute('fill', 'currentColor');
+        toast('ذخیره شد');
+      }
+      if (currentTab === 'saved') loadCurrentTab();
+    } catch (e) { console.error(e); toast('خطا', true); }
+  }
+
+  // ===== COMMENTS =====
+  async function openComments(postId) {
+    activeCommentPostId = postId;
+    $('commentsList').innerHTML = '<div class="spinner" style="margin:30px auto"></div>';
+    $('commentsModal').classList.add('show');
+    $('modalCommentInput').value = '';
+    $('modalSendBtn').disabled = true;
+    try {
+      var res = await sb.from('comments').select('id, body, created_at, profiles(username, avatar_url)').eq('post_id', postId).order('created_at');
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) {
+        $('commentsList').innerHTML = '<div class="modal-empty">هنوز کامنتی نیست</div>';
+        return;
+      }
+      $('commentsList').innerHTML = res.data.map(function (c) {
+        var u = (c.profiles && c.profiles.username) || 'کاربر';
+        var av = c.profiles && c.profiles.avatar_url;
+        var avHtml = av ? '<div class="avatar-sm"><img src="' + esc(av) + '" /></div>' : '<div class="avatar-sm">' + esc(initialOf(u)) + '</div>';
+        return '<div class="modal-comment">' + avHtml +
+          '<div><b>' + esc(u) + '</b>' + esc(c.body) +
+          '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">' + esc(timeAgo(c.created_at)) + '</div></div></div>';
+      }).join('');
+    } catch (e) { console.error(e); $('commentsList').innerHTML = '<div class="modal-empty">خطا</div>'; }
+  }
+
+  $('closeComments').onclick = function () { $('commentsModal').classList.remove('show'); activeCommentPostId = null; };
+  $('commentsModal').onclick = function (e) { if (e.target.id === 'commentsModal') $('closeComments').click(); };
+  $('modalCommentInput').oninput = function () { $('modalSendBtn').disabled = !this.value.trim(); };
+  $('modalSendBtn').onclick = async function () {
+    if (!activeCommentPostId) return;
+    var body = $('modalCommentInput').value.trim();
+    if (!body) return;
+    $('modalSendBtn').disabled = true;
+    try {
+      var res = await sb.from('comments').insert({ post_id: activeCommentPostId, user_id: currentUser.id, body: body });
+      if (res.error) throw res.error;
+      toast('کامنت ثبت شد');
+      openComments(activeCommentPostId);
+      loadFeed();
+    } catch (e) { toast('خطا: ' + e.message, true); $('modalSendBtn').disabled = false; }
+  };
+  $('modalCommentInput').onkeydown = function (e) { if (e.key === 'Enter' && !$('modalSendBtn').disabled) $('modalSendBtn').click(); };
+
+  // ===== PROFILE TABS =====
+  $('tabPostsBtn').onclick = function () { switchProfileTab('posts'); };
+  $('tabSavedBtn').onclick = function () { switchProfileTab('saved'); };
+  $('tabTaggedBtn').onclick = function () { switchProfileTab('tagged'); };
+
+  function switchProfileTab(tab) {
+    currentTab = tab;
+    $('tabPostsBtn').classList.toggle('active', tab === 'posts');
+    $('tabSavedBtn').classList.toggle('active', tab === 'saved');
+    $('tabTaggedBtn').classList.toggle('active', tab === 'tagged');
+    loadCurrentTab();
+  }
+
+  function loadCurrentTab() {
+    if (currentTab === 'posts') return loadProfileGrid();
+    if (currentTab === 'saved') return loadSavedGrid();
+    if (currentTab === 'tagged') return loadTaggedGrid();
+  }
+
+  async function loadProfileGrid() {
+    if (!currentUser) return;
+    var grid = $('profileGrid');
+    grid.innerHTML = '<div class="spinner" style="grid-column:1/-1;margin:30px auto"></div>';
+    var res = await sb.from('posts').select('id, image_url, media_type').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    if (!res.data || res.data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">هنوز پستی نداری</div>';
+      return;
+    }
+    grid.innerHTML = res.data.map(function (p) {
+      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
+    }).join('');
+  }
+
+  async function loadSavedGrid() {
+    var grid = $('profileGrid');
+    grid.innerHTML = '<div class="spinner" style="grid-column:1/-1;margin:30px auto"></div>';
+    var s = await sb.from('saves').select('post_id, posts(id, image_url, media_type)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    if (!s.data || s.data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">چیزی ذخیره نکردی</div>';
+      return;
+    }
+    grid.innerHTML = s.data.map(function (item) {
+      var p = item.posts;
+      if (!p) return '';
+      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
+    }).join('');
+  }
+
+  async function loadTaggedGrid() {
+    var grid = $('profileGrid');
+    grid.innerHTML = '<div class="spinner" style="grid-column:1/-1;margin:30px auto"></div>';
+    var t = await sb.from('tags').select('post_id, posts(id, image_url, media_type)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    if (!t.data || t.data.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">کسی تو رو تگ نکرده</div>';
+      return;
+    }
+    grid.innerHTML = t.data.map(function (item) {
+      var p = item.posts;
+      if (!p) return '';
+      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
+    }).join('');
+  }
+
+  // ===== MESSAGES =====
+  $('navMessages').onclick = function () {
+    hide('homeView'); hide('profileView'); hide('searchView');
+    hide('otherProfileView'); hide('chatView');
+    document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
+    show('messagesView');
+    loadConversations();
+  };
+
+  async function loadConversations() {
+    var list = $('convList');
+    list.innerHTML = '<div class="spinner" style="margin:30px auto"></div>';
+    try {
+      var res = await sb.from('conversations')
+        .select('id, user1_id, user2_id, updated_at')
+        .or('user1_id.eq.' + currentUser.id + ',user2_id.eq.' + currentUser.id)
+        .order('updated_at', { ascending: false });
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-secondary);font-size:14px">هنوز پیامی نداری</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < res.data.length; i++) {
+        var c = res.data[i];
+        var otherId = c.user1_id === currentUser.id ? c.user2_id : c.user1_id;
+        var pRes = await sb.from('profiles').select('username, avatar_url').eq('id', otherId).single();
+        var lastRes = await sb.from('messages').select('body').eq('conversation_id', c.id).order('created_at', { ascending: false }).limit(1);
+        var other = pRes.data || { username: 'کاربر' };
+        var last = (lastRes.data && lastRes.data[0]) || {};
+        var av = other.avatar_url ? '<img src="' + esc(other.avatar_url) + '" />' : esc(initialOf(other.username));
+        html += '<div class="conv-item" data-conv="' + c.id + '" data-user="' + otherId + '">' +
+          '<div class="avatar">' + av + '</div>' +
+          '<div class="info"><div class="name">' + esc(other.username) + '</div>' +
+          '<div class="last">' + esc(last.body || 'شروع کن...') + '</div></div></div>';
+      }
+      list.innerHTML = html;
+      list.querySelectorAll('[data-conv]').forEach(function (el) {
+        el.onclick = function () { openChat(el.dataset.conv, el.dataset.user); };
+      });
+    } catch (e) { console.error(e); list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-secondary)">خطا</div>'; }
+  }
+
+  async function openChat(convId, otherUserId) {
+    activeConvId = convId;
+    hide('messagesView'); hide('homeView'); hide('profileView');
+    hide('searchView'); hide('otherProfileView');
+    show('chatView');
+    document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
+
+    var pRes = await sb.from('profiles').select('username, avatar_url').eq('id', otherUserId).single();
+    var other = pRes.data || { username: 'کاربر' };
+    $('chatName').textContent = other.username;
+    var av = $('chatAvatar');
+    if (other.avatar_url) av.innerHTML = '<img src="' + esc(other.avatar_url) + '" />';
+    else av.textContent = initialOf(other.username);
+
+    $('chatInput').value = '';
+    $('chatSendBtn').disabled = true;
+    await loadMessages();
+
+    if (chatChannel) sb.removeChannel(chatChannel);
+    chatChannel = sb.channel('chat:' + convId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+        function () { loadMessages(); })
+      .subscribe();
+  }
+
+  async function loadMessages() {
+    if (!activeConvId) return;
+    var body = $('chatBody');
+    var res = await sb.from('messages').select('id, sender_id, body, created_at')
+      .eq('conversation_id', activeConvId).order('created_at', { ascending: true });
+    if (!res.data || res.data.length === 0) {
+      body.innerHTML = '<div style="text-align:center;color:var(--text-secondary);font-size:13px;margin-top:20px">شروع کن به پیام دادن...</div>';
+      return;
+    }
+    body.innerHTML = res.data.map(function (m) {
+      var mine = m.sender_id === currentUser.id;
+      return '<div class="msg ' + (mine ? 'me' : 'other') + '">' + esc(m.body) +
+        '<div class="msg-time">' + esc(timeAgo(m.created_at)) + '</div></div>';
+    }).join('');
+    body.scrollTop = body.scrollHeight;
+  }
+
+  $('chatInput').oninput = function () { $('chatSendBtn').disabled = !this.value.trim(); };
+  $('chatInput').onkeydown = function (e) { if (e.key === 'Enter' && !$('chatSendBtn').disabled) $('chatSendBtn').click(); };
+  $('chatSendBtn').onclick = async function () {
+    var body = $('chatInput').value.trim();
+    if (!body) return;
+    $('chatSendBtn').disabled = true;
+    try {
+      var res = await sb.from('messages').insert({ conversation_id: activeConvId, sender_id: currentUser.id, body: body });
+      if (res.error) throw res.error;
+      await sb.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', activeConvId);
+      $('chatInput').value = '';
+      await loadMessages();
+    } catch (e) { toast('خطا: ' + e.message, true); $('chatSendBtn').disabled = false; }
+  };
+  $('chatBack').onclick = function () {
+    if (chatChannel) { sb.removeChannel(chatChannel); chatChannel = null; }
+    hide('chatView');
+    show('messagesView');
+    loadConversations();
+  };
+
+  // ===== START CONVERSATION =====
+  $('opMessageBtn').onclick = async function () {
+    var otherId = $('opFollowBtn').dataset.userId;
+    if (!otherId) return;
+    if (otherId === currentUser.id) return toast('نمی‌تونی به خودت پیام بدی', true);
+
+    var u1 = currentUser.id < otherId ? currentUser.id : otherId;
+    var u2 = currentUser.id < otherId ? otherId : currentUser.id;
+
+    var existing = await sb.from('conversations').select('id').eq('user1_id', u1).eq('user2_id', u2).maybeSingle();
+    if (existing.data) return openChat(existing.data.id, otherId);
+
+    var ins = await sb.from('conversations').insert({ user1_id: u1, user2_id: u2 }).select().single();
+    if (ins.error) { console.error(ins.error); return toast('خطا در ساخت مکالمه', true); }
+    openChat(ins.data.id, otherId);
+  };
+
+  // ===== REALTIME =====
+  try {
+    sb.channel('public:likes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, function () {
+        if (!$('homeView').classList.contains('hidden')) loadFeed();
+      })
+      .subscribe();
+  } catch (e) { /* ignore */ }
+
+  setTimeout(function () {
+    if ($('loading') && !$('loading').classList.contains('hidden')) {
+      $('loading').innerHTML = 'گیر کرده؟ F12 بزن و ارور کنسول رو ببین.';
+    }
+  }, 5000);
+
+})();
+</script>
+</body>
+</html>
