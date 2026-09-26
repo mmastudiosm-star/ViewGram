@@ -26,7 +26,6 @@
   img { display: block; max-width: 100%; }
   .hidden { display: none !important; }
 
-  /* ===== TOP BAR ===== */
   .top-bar {
     position: sticky; top: 0; z-index: 50; background: var(--card);
     border-bottom: 1px solid var(--border); height: 54px;
@@ -34,23 +33,16 @@
   }
   .top-bar .logo {
     font-family: 'Segoe Script','Brush Script MT',cursive;
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 26px; font-weight: 700;
     background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .top-bar .actions { display: flex; gap: 16px; align-items: center; }
   .top-bar .actions button { font-size: 22px; color: var(--text); }
 
-  /* ===== MAIN ===== */
   .main { max-width: 630px; margin: 0 auto; padding-bottom: 70px; }
 
-  /* ===== PAGE VISIBILITY ===== */
-  #homeView, #profileView, #searchView, #otherProfileView, #messagesView, #chatView {
-    display: none;
-  }
+  #homeView, #profileView, #searchView, #otherProfileView, #messagesView, #chatView { display: none; }
   #homeView:not(.hidden),
   #profileView:not(.hidden),
   #searchView:not(.hidden),
@@ -58,16 +50,12 @@
   #messagesView:not(.hidden) { display: block; }
   #chatView:not(.hidden) { display: flex; }
 
-  /* ===== STORIES ===== */
   .stories {
     background: var(--card); border-bottom: 1px solid var(--border);
     padding: 14px 0; display: flex; gap: 14px; overflow-x: auto; scrollbar-width: none;
   }
   .stories::-webkit-scrollbar { display: none; }
-  .story {
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
-    flex-shrink: 0; padding: 0 4px; cursor: pointer;
-  }
+  .story { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; padding: 0 4px; cursor: pointer; }
   .story:first-child { margin-right: 12px; }
   .story:last-child { margin-left: 12px; }
   .story-avatar {
@@ -95,7 +83,6 @@
   .story-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
   .story-name { font-size: 12px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* ===== POST ===== */
   .post { background: var(--card); border-bottom: 1px solid var(--border); margin-bottom: 8px; }
   @media (min-width: 640px) {
     .post { border: 1px solid var(--border); border-radius: 8px; margin: 16px 0; overflow: hidden; }
@@ -115,9 +102,7 @@
     position: relative; background: #000; aspect-ratio: 1 / 1; overflow: hidden; user-select: none;
   }
   .post-image-wrap img,
-  .post-image-wrap video {
-    width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none;
-  }
+  .post-image-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none; }
   .post-image-wrap .video-badge {
     position: absolute; top: 10px; left: 10px;
     background: rgba(0,0,0,0.6); color: #fff;
@@ -145,16 +130,16 @@
   .post-comments-link { padding: 0 16px 6px; font-size: 14px; color: var(--text-secondary); cursor: pointer; }
   .post-time { padding: 0 16px 12px; font-size: 10px; color: var(--text-secondary); }
 
-  /* ===== COMPOSER ===== */
   .composer { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin: 12px 0; padding: 14px; display: none; }
   .composer.show { display: block; }
   .composer h3 { font-size: 16px; margin-bottom: 12px; text-align: center; font-weight: 600; }
-  .composer .media-tabs { display: flex; gap: 6px; margin-bottom: 10px; justify-content: center; }
+  .composer .media-tabs { display: flex; gap: 6px; margin-bottom: 10px; justify-content: center; flex-wrap: wrap; }
   .composer .media-tabs button {
     padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
     background: var(--hover); color: var(--text-secondary);
   }
   .composer .media-tabs button.active { background: var(--blue); color: #fff; }
+  .composer .media-tabs button.reel-tab.active { background: linear-gradient(45deg, #f09433, #dc2743); color: #fff; }
   .composer .drop {
     display: block; text-align: center; padding: 30px 20px;
     border: 2px dashed var(--border); border-radius: 8px;
@@ -177,7 +162,6 @@
   .btn-secondary { background: transparent; color: var(--text); }
   .btn-secondary:hover { background: var(--hover); }
 
-  /* ===== PROFILE ===== */
   .profile-page { padding: 20px 16px; }
   .profile-header { display: flex; gap: 24px; align-items: center; margin-bottom: 20px; }
   .profile-avatar {
@@ -202,13 +186,9 @@
   .profile-tabs { display: flex; border-top: 1px solid var(--border); margin: 20px -16px 0; }
   .profile-tabs button {
     flex: 1; padding: 12px; font-size: 12px; letter-spacing: 1px;
-    color: var(--text-secondary); border-bottom: 2px solid transparent;
-    background: none;
+    color: var(--text-secondary); border-bottom: 2px solid transparent; background: none;
   }
-  .profile-tabs button.active {
-    color: var(--text); font-weight: 700; border-bottom-color: var(--text);
-    background: none;
-  }
+  .profile-tabs button.active { color: var(--text); font-weight: 700; border-bottom-color: var(--text); background: none; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 0 -16px; }
   .grid .cell { aspect-ratio: 1; background: #000; overflow: hidden; position: relative; }
   .grid .cell img { width: 100%; height: 100%; object-fit: cover; }
@@ -225,7 +205,6 @@
   .other-profile-actions button.primary { background: var(--blue); color: #fff; }
   .other-profile-actions button.primary.following { background: var(--hover); color: var(--text); }
 
-  /* ===== BOTTOM NAV ===== */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
     border-top: 1px solid var(--border); height: 54px;
@@ -235,15 +214,12 @@
   .bottom-nav svg { width: 24px; height: 24px; display: block; }
   .bottom-nav button.active svg { fill: currentColor; }
 
-  /* ===== AUTH ===== */
   .auth-wrap { max-width: 380px; margin: 40px auto; padding: 0 20px; text-align: center; }
   .auth-wrap .logo {
     font-family: 'Segoe Script','Brush Script MT',cursive;
     font-size: 44px; margin-bottom: 30px; font-weight: 700;
     background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 12px; }
   .auth-card input {
@@ -256,7 +232,6 @@
   .auth-switch { font-size: 13px; color: var(--blue); cursor: pointer; margin-top: 12px; display: block; }
   .auth-note { font-size: 12px; color: var(--text-secondary); margin-top: 16px; line-height: 1.5; }
 
-  /* ===== SEARCH ===== */
   .search-page { padding: 12px 16px 80px; max-width: 630px; margin: 0 auto; }
   .search-box { position: relative; margin-bottom: 16px; }
   .search-box input {
@@ -289,7 +264,6 @@
   .search-user .follow-btn.following { background: var(--hover); color: var(--text); }
   .search-empty { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
 
-  /* ===== STORY VIEWER ===== */
   .story-viewer { position: fixed; inset: 0; background: #000; z-index: 500; display: none; flex-direction: column; }
   .story-viewer.show { display: flex !important; }
   .story-progress-bar { display: flex; gap: 3px; padding: 10px 10px 0; position: relative; z-index: 3; }
@@ -325,7 +299,6 @@
   .story-viewer-body input::placeholder { color: rgba(255,255,255,.6); }
   .story-viewer-body input:focus { outline: none; border-color: #fff; }
 
-  /* ===== STORY UPLOAD ===== */
   .story-upload-modal {
     position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 400;
     display: none; align-items: center; justify-content: center; padding: 20px;
@@ -345,7 +318,6 @@
   }
   .story-upload-card .row { display: flex; gap: 8px; justify-content: flex-end; }
 
-  /* ===== MODAL ===== */
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,.65);
     z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
@@ -374,7 +346,6 @@
   .modal-footer button { color: var(--blue); font-weight: 600; font-size: 14px; }
   .modal-footer button:disabled { color: #b3dffc; cursor: default; }
 
-  /* ===== MESSAGES ===== */
   .messages-page { padding-bottom: 80px; }
   .conv-list { max-width: 630px; margin: 0 auto; }
   .conv-item {
@@ -393,14 +364,7 @@
   .conv-item .info .name { font-weight: 600; font-size: 14px; }
   .conv-item .info .last { font-size: 12px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* ===== CHAT ===== */
-  .chat-page {
-    flex-direction: column;
-    height: calc(100vh - 108px);
-    max-width: 630px;
-    margin: 0 auto;
-    overflow: hidden;
-  }
+  .chat-page { flex-direction: column; height: calc(100vh - 108px); max-width: 630px; margin: 0 auto; overflow: hidden; }
   .chat-header {
     padding: 10px 16px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 10px;
@@ -415,10 +379,7 @@
   }
   .chat-header .avatar img { width: 100%; height: 100%; object-fit: cover; }
   .chat-header .name { font-weight: 600; font-size: 14px; }
-  .chat-body {
-    flex: 1; overflow-y: auto; padding: 16px;
-    display: flex; flex-direction: column; gap: 8px;
-  }
+  .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
   .msg { max-width: 70%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
   .msg.me { background: var(--blue); color: #fff; align-self: flex-start; border-bottom-right-radius: 4px; }
   .msg.other { background: var(--hover); color: var(--text); align-self: flex-end; border-bottom-left-radius: 4px; }
@@ -436,7 +397,6 @@
   .chat-input button { padding: 0 16px; color: var(--blue); font-weight: 600; font-size: 14px; }
   .chat-input button:disabled { opacity: 0.5; }
 
-  /* ===== LOADING / TOAST ===== */
   #loading { padding: 60px 20px; text-align: center; color: var(--text-secondary); }
   .spinner {
     width: 32px; height: 32px; border: 3px solid var(--border);
@@ -454,16 +414,12 @@
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast-error { background: #ed4956; }
 
-  /* ===== EDIT PROFILE MODAL ===== */
   .edit-modal {
     position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 300;
     display: none; align-items: center; justify-content: center; padding: 20px;
   }
   .edit-modal.show { display: flex !important; }
-  .edit-card {
-    background: var(--card); border-radius: 14px; padding: 20px;
-    width: 100%; max-width: 420px;
-  }
+  .edit-card { background: var(--card); border-radius: 14px; padding: 20px; width: 100%; max-width: 420px; }
   .edit-card h3 { font-size: 16px; margin-bottom: 16px; text-align: center; font-weight: 600; }
   .edit-card label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; margin-top: 10px; }
   .edit-card input, .edit-card textarea {
@@ -474,6 +430,111 @@
   .edit-card input:focus, .edit-card textarea:focus { outline: none; border-color: var(--blue); }
   .edit-card textarea { resize: none; min-height: 60px; }
   .edit-card .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+  /* ===== REELS ===== */
+  .reels-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 90;
+    padding-top: 54px;
+    padding-bottom: 54px;
+  }
+  .reels-page.show { display: block; }
+  .reels-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    font-family: 'Segoe Script','Brush Script MT',cursive;
+    font-weight: 700;
+    font-size: 18px;
+    background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .reels-container {
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .reels-container::-webkit-scrollbar { display: none; }
+  .reel {
+    position: relative;
+    height: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    overflow: hidden;
+  }
+  .reel video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+  }
+  .reel-play-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    font-size: 80px;
+    color: rgba(255,255,255,0.9);
+    pointer-events: none;
+    transition: transform 0.2s, opacity 0.2s;
+    opacity: 0;
+    z-index: 4;
+  }
+  .reel-play-icon.show {
+    transform: translate(-50%,-50%) scale(1);
+    opacity: 1;
+  }
+  .reel-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px 16px 30px;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 25%, transparent 50%);
+    z-index: 3;
+  }
+  .reel-bottom { color: #fff; max-width: 72%; }
+  .reel-user {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    cursor: pointer; pointer-events: auto;
+  }
+  .reel-user .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(45deg, #f09433, #dc2743);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; color: #fff; overflow: hidden;
+    border: 2px solid #fff; flex-shrink: 0;
+  }
+  .reel-user .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .reel-user .uname { font-weight: 700; font-size: 14px; }
+  .reel-caption { font-size: 14px; line-height: 1.4; margin-bottom: 6px; }
+  .reel-side {
+    position: absolute; right: 10px; bottom: 90px;
+    display: flex; flex-direction: column; gap: 22px; align-items: center;
+    pointer-events: auto; z-index: 5;
+  }
+  .reel-side button {
+    color: #fff; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; font-size: 11px; font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .reel-side button svg { width: 30px; height: 30px; }
+  .reel-side button.liked svg { fill: var(--red); stroke: var(--red); }
 </style>
 </head>
 <body>
@@ -538,6 +599,7 @@
       <div class="media-tabs">
         <button id="tabImage" class="active" type="button">📷 عکس</button>
         <button id="tabVideo" type="button">🎬 ویدیو</button>
+        <button id="tabReel" type="button" class="reel-tab">✨ ریلز</button>
       </div>
       <label class="drop" for="fileInput" id="fileLabel">📷 برای انتخاب عکس کلیک کن</label>
       <input type="file" id="fileInput" accept="image/*" class="hidden" />
@@ -605,9 +667,7 @@
       <button id="opFollowBtn" class="primary">دنبال کن</button>
       <button id="opMessageBtn">پیام</button>
     </div>
-    <div class="profile-tabs">
-      <button class="active">پست‌ها</button>
-    </div>
+    <div class="profile-tabs"><button class="active">پست‌ها</button></div>
     <div class="grid" id="opGrid"></div>
   </div>
 
@@ -628,6 +688,12 @@
       <input type="text" id="chatInput" placeholder="پیام بنویس..." />
       <button id="chatSendBtn" disabled>ارسال</button>
     </div>
+  </div>
+
+  <!-- REELS VIEW -->
+  <div id="reelsView" class="reels-page">
+    <div class="reels-header">Reels</div>
+    <div class="reels-container" id="reelsContainer"></div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -720,11 +786,29 @@
 (function () {
   'use strict';
 
-  var SUPABASE_URL = 'https://eiwxwnnymntjholvoobo.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpd3h3bm55bW50amhvbHZvb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzQ4MTgsImV4cCI6MjEwNTkxMDgxOH0.fmVCamFmnvHzTvJfVI_V9WuspqyO2xWrilID6wZCg_0';
+  // ============================================================
+  // ⚙️ تنظیمات
+  // ============================================================
+  var CONFIG = {
+    SUPABASE_URL: 'https://eiwxwnnymntjholvoobo.supabase.co',
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpd3h3bm55bW50amhvbHZvb2JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzMzQ4MTgsImV4cCI6MjEwNTkxMDgxOH0.fmVCamFmnvHzTvJfVI_V9WuspqyO2xWrilID6wZCg_0',
+    MAX_VIDEO_MB: 50,
+    MAX_IMAGE_MB: 10,
+    APP_NAME: 'ViewGram'
+  };
+  // ============================================================
+
+  var SUPABASE_URL = CONFIG.SUPABASE_URL;
+  var SUPABASE_ANON_KEY = CONFIG.SUPABASE_ANON_KEY;
+  var MAX_VIDEO_MB = CONFIG.MAX_VIDEO_MB;
+  var MAX_IMAGE_MB = CONFIG.MAX_IMAGE_MB;
 
   if (!window.supabase || !window.supabase.createClient) {
     document.getElementById('loading').innerHTML = 'خطا: کتابخانه Supabase لود نشد.';
+    return;
+  }
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    document.getElementById('loading').innerHTML = 'خطا: تنظیمات سرور پیدا نشد.';
     return;
   }
 
@@ -744,6 +828,7 @@
   var activeConvId = null;
   var chatChannel = null;
   var currentTab = 'posts';
+  var reelObserver = null;
   window._savedPostIds = {};
 
   var $ = function (id) { return document.getElementById(id); };
@@ -821,7 +906,6 @@
     location.reload();
   };
 
-  // ===== AUTH STATE =====
   sb.auth.onAuthStateChange(function (event, session) {
     if (session && session.user) {
       currentUser = session.user;
@@ -837,7 +921,6 @@
     }
   });
 
-  // ===== PROFILE =====
   async function loadProfile() {
     try {
       var res = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
@@ -902,7 +985,6 @@
     inp.click();
   };
 
-  // ===== EDIT PROFILE =====
   $('editProfileBtn').onclick = function () {
     $('editUsername').value = (currentProfile && currentProfile.username) || '';
     $('editBio').value = (currentProfile && currentProfile.bio) || '';
@@ -942,6 +1024,9 @@
   function switchView(view) {
     hide('homeView'); hide('profileView'); hide('searchView');
     hide('otherProfileView'); hide('messagesView'); hide('chatView');
+    var rv = $('reelsView');
+    if (rv) rv.classList.remove('show');
+    document.querySelectorAll('#reelsContainer video').forEach(function (v) { v.pause(); });
     document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
 
     if (view === 'home') { show('homeView'); $('navHome').classList.add('active'); }
@@ -950,14 +1035,18 @@
       show('profileView'); $('navProfile').classList.add('active');
       loadProfile(); loadCurrentTab();
     }
+    else if (view === 'reels') {
+      rv.classList.add('show');
+      $('navReels').classList.add('active');
+      loadReels();
+    }
   }
 
   document.querySelectorAll('.bottom-nav button').forEach(function (btn) {
     btn.onclick = function () {
       var view = btn.dataset.view;
       if (view === 'create') return toggleComposer();
-      if (view === 'reels') return toast('به‌زودی...');
-      if (view === 'home' || view === 'search' || view === 'profile') switchView(view);
+      if (view === 'home' || view === 'search' || view === 'profile' || view === 'reels') switchView(view);
     };
   });
 
@@ -981,13 +1070,14 @@
     $('postBtn').disabled = true;
     $('tabImage').classList.add('active');
     $('tabVideo').classList.remove('active');
+    $('tabReel').classList.remove('active');
   }
 
-  // ===== MEDIA TABS =====
   $('tabImage').onclick = function () {
     selectedFileType = 'image';
     $('tabImage').classList.add('active');
     $('tabVideo').classList.remove('active');
+    $('tabReel').classList.remove('active');
     $('fileInput').setAttribute('accept', 'image/*');
     $('fileLabel').textContent = '📷 برای انتخاب عکس کلیک کن';
     $('preview').style.display = 'none';
@@ -999,6 +1089,7 @@
     selectedFileType = 'video';
     $('tabVideo').classList.add('active');
     $('tabImage').classList.remove('active');
+    $('tabReel').classList.remove('active');
     $('fileInput').setAttribute('accept', 'video/*');
     $('fileLabel').textContent = '🎬 برای انتخاب ویدیو کلیک کن';
     $('preview').style.display = 'none';
@@ -1006,8 +1097,20 @@
     selectedFile = null;
     $('postBtn').disabled = true;
   };
+  $('tabReel').onclick = function () {
+    selectedFileType = 'reel';
+    $('tabReel').classList.add('active');
+    $('tabImage').classList.remove('active');
+    $('tabVideo').classList.remove('active');
+    $('fileInput').setAttribute('accept', 'video/*');
+    $('fileLabel').textContent = '✨ برای انتخاب ویدیو ریلز کلیک کن';
+    $('preview').style.display = 'none';
+    $('previewVideo').style.display = 'none';
+    selectedFile = null;
+    $('postBtn').disabled = true;
+  };
 
-  // ===== STORIES =====
+  // ===== STORIES (100 سال) =====
   async function buildStories() {
     var bar = $('storiesBar');
     var uname = (currentProfile && currentProfile.username) || 'کاربر';
@@ -1024,7 +1127,6 @@
     try {
       var res = await sb.from('stories')
         .select('id, user_id, media_url, created_at, profiles(username, avatar_url)')
-        .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false })
         .limit(80);
       if (res.error) throw res.error;
@@ -1099,6 +1201,7 @@
       var up = await sb.storage.from('stories').upload(path, storyFile, { cacheControl: '3600', upsert: false });
       if (up.error) throw up.error;
       var urlRes = sb.storage.from('stories').getPublicUrl(path);
+      // انقضا ۱۰۰ سال بعد — اما default دیتابیس هم ۱۰۰ ساله‌ست
       var ins = await sb.from('stories').insert({ user_id: currentUser.id, media_url: urlRes.data.publicUrl, media_type: 'image' });
       if (ins.error) throw ins.error;
       toast('استوری منتشر شد!');
@@ -1114,7 +1217,6 @@
       var res = await sb.from('stories')
         .select('id, media_url, created_at, profiles(username, avatar_url)')
         .eq('user_id', userId)
-        .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: true });
       if (res.error) throw res.error;
       if (!res.data || res.data.length === 0) return toast('استوری‌ای وجود نداره');
@@ -1237,6 +1339,8 @@
   async function openUserProfile(userId) {
     if (userId === currentUser.id) return switchView('profile');
     hide('homeView'); hide('searchView'); hide('profileView'); hide('messagesView'); hide('chatView');
+    $('reelsView').classList.remove('show');
+    document.querySelectorAll('#reelsContainer video').forEach(function (v) { v.pause(); });
     show('otherProfileView');
 
     var pRes = await sb.from('profiles').select('*').eq('id', userId).single();
@@ -1283,7 +1387,7 @@
       return;
     }
     grid.innerHTML = res.data.map(function (p) {
-      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      var badge = p.media_type === 'video' || p.media_type === 'reel' ? '<div class="play-icon">▶</div>' : '';
       return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
     }).join('');
   }
@@ -1316,11 +1420,14 @@
     if (selectedFileType === 'image' && !file.type.startsWith('image/')) {
       return toast('لطفاً یه عکس انتخاب کن', true);
     }
-    if (selectedFileType === 'video' && !file.type.startsWith('video/')) {
+    if ((selectedFileType === 'video' || selectedFileType === 'reel') && !file.type.startsWith('video/')) {
       return toast('لطفاً یه ویدیو انتخاب کن', true);
     }
-    if (selectedFileType === 'video' && file.size > 50 * 1024 * 1024) {
-      return toast('حجم ویدیو بیشتر از ۵۰ مگابایته', true);
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024 && selectedFileType !== 'image') {
+      return toast('حجم ویدیو بیشتر از ' + MAX_VIDEO_MB + ' مگابایته', true);
+    }
+    if (selectedFileType === 'image' && file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      return toast('حجم عکس بیشتر از ' + MAX_IMAGE_MB + ' مگابایته', true);
     }
 
     selectedFile = file;
@@ -1345,7 +1452,7 @@
     var btn = $('postBtn');
     btn.disabled = true; btn.textContent = 'در حال آپلود...';
     try {
-      var ext = (selectedFile.name.split('.').pop() || (selectedFileType === 'video' ? 'mp4' : 'jpg')).toLowerCase();
+      var ext = (selectedFile.name.split('.').pop() || (selectedFileType === 'image' ? 'jpg' : 'mp4')).toLowerCase();
       var path = currentUser.id + '/' + Date.now() + '.' + ext;
       var up = await sb.storage.from('posts').upload(path, selectedFile, { cacheControl: '31536000', upsert: false });
       if (up.error) throw up.error;
@@ -1373,6 +1480,7 @@
     try {
       var res = await sb.from('posts')
         .select('id, image_url, caption, created_at, user_id, media_type, profiles(username, avatar_url)')
+        .neq('media_type', 'reel')
         .order('created_at', { ascending: false })
         .limit(30);
       if (res.error) throw res.error;
@@ -1604,7 +1712,7 @@
       return;
     }
     grid.innerHTML = res.data.map(function (p) {
-      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      var badge = p.media_type === 'video' || p.media_type === 'reel' ? '<div class="play-icon">▶</div>' : '';
       return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
     }).join('');
   }
@@ -1620,7 +1728,7 @@
     grid.innerHTML = s.data.map(function (item) {
       var p = item.posts;
       if (!p) return '';
-      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      var badge = p.media_type === 'video' || p.media_type === 'reel' ? '<div class="play-icon">▶</div>' : '';
       return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
     }).join('');
   }
@@ -1636,15 +1744,172 @@
     grid.innerHTML = t.data.map(function (item) {
       var p = item.posts;
       if (!p) return '';
-      var badge = p.media_type === 'video' ? '<div class="play-icon">▶</div>' : '';
+      var badge = p.media_type === 'video' || p.media_type === 'reel' ? '<div class="play-icon">▶</div>' : '';
       return '<div class="cell"><img src="' + esc(p.image_url) + '" loading="lazy" />' + badge + '</div>';
     }).join('');
+  }
+
+  // ===== REELS =====
+  async function loadReels() {
+    var container = $('reelsContainer');
+    container.innerHTML = '<div class="spinner" style="margin:120px auto;border-color:#333;border-top-color:#fff"></div>';
+
+    try {
+      var res = await sb.from('posts')
+        .select('id, image_url, caption, created_at, user_id, media_type, profiles(username, avatar_url)')
+        .eq('media_type', 'reel')
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (res.error) throw res.error;
+
+      if (!res.data || res.data.length === 0) {
+        container.innerHTML = '<div style="color:#fff;text-align:center;padding:120px 20px;font-size:15px">هنوز ریلی نیست. از تب ✨ ریلز یه ویدیو بذار!</div>';
+        return;
+      }
+
+      var ids = res.data.map(function (p) { return p.id; });
+      var likesRes = await sb.from('likes').select('post_id, user_id').in('post_id', ids);
+      var likes = likesRes.data || [];
+
+      container.innerHTML = '';
+      res.data.forEach(function (p) {
+        container.appendChild(renderReel(p, likes));
+      });
+
+      setupReelObserver();
+    } catch (e) {
+      console.error(e);
+      container.innerHTML = '<div style="color:#fff;text-align:center;padding:120px 20px">خطا در بارگذاری</div>';
+    }
+  }
+
+  function renderReel(post, likes) {
+    var pLikes = likes.filter(function (l) { return l.post_id === post.id; });
+    var liked = pLikes.some(function (l) { return l.user_id === currentUser.id; });
+    var uname = (post.profiles && post.profiles.username) || 'کاربر';
+    var avUrl = post.profiles && post.profiles.avatar_url;
+
+    var el = document.createElement('div');
+    el.className = 'reel';
+    el.dataset.postId = post.id;
+    el.dataset.userId = post.user_id;
+
+    var avHtml = avUrl
+      ? '<div class="avatar"><img src="' + esc(avUrl) + '" /></div>'
+      : '<div class="avatar">' + esc(initialOf(uname)) + '</div>';
+
+    el.innerHTML =
+      '<video src="' + esc(post.image_url) + '" loop playsinline preload="metadata" muted></video>' +
+      '<div class="reel-play-icon">▶</div>' +
+      '<div class="reel-overlay">' +
+        '<div class="reel-bottom">' +
+          '<div class="reel-user">' + avHtml + '<div class="uname">' + esc(uname) + '</div></div>' +
+          (post.caption ? '<div class="reel-caption">' + esc(post.caption) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="reel-side">' +
+        '<button data-like="' + post.id + '" class="' + (liked ? 'liked' : '') + '">' +
+          '<svg viewBox="0 0 24 24" fill="' + (liked ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2">' +
+            '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' +
+          '</svg>' +
+          '<span data-likes="' + post.id + '">' + faNum(pLikes.length) + '</span>' +
+        '</button>' +
+        '<button data-comment="' + post.id + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+            '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>' +
+          '</svg>' +
+          '<span>کامنت</span>' +
+        '</button>' +
+        '<button data-share="' + post.id + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+            '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>' +
+          '</svg>' +
+          '<span>اشتراک</span>' +
+        '</button>' +
+      '</div>';
+
+    var video = el.querySelector('video');
+    var playIcon = el.querySelector('.reel-play-icon');
+    var likeBtn = el.querySelector('[data-like]');
+
+    el.addEventListener('click', function (e) {
+      if (e.target.closest('.reel-side') || e.target.closest('.reel-user')) return;
+      if (video.paused) {
+        video.play().catch(function () {});
+        playIcon.classList.remove('show');
+      } else {
+        video.pause();
+        playIcon.classList.add('show');
+        setTimeout(function () { playIcon.classList.remove('show'); }, 700);
+      }
+    });
+
+    likeBtn.onclick = async function (e) {
+      e.stopPropagation();
+      var isLiked = likeBtn.classList.contains('liked');
+      try {
+        if (isLiked) {
+          likeBtn.classList.remove('liked');
+          likeBtn.querySelector('svg').setAttribute('fill', 'none');
+          await sb.from('likes').delete().eq('post_id', post.id).eq('user_id', currentUser.id);
+        } else {
+          likeBtn.classList.add('liked');
+          likeBtn.querySelector('svg').setAttribute('fill', 'currentColor');
+          await sb.from('likes').insert({ post_id: post.id, user_id: currentUser.id });
+        }
+        var c = await sb.from('likes').select('id', { count: 'exact', head: true }).eq('post_id', post.id);
+        var likesSpan = el.querySelector('[data-likes]');
+        if (likesSpan) likesSpan.textContent = faNum(c.count);
+      } catch (err) { console.error(err); }
+    };
+
+    el.querySelector('[data-comment]').onclick = function (e) {
+      e.stopPropagation();
+      openComments(post.id);
+    };
+
+    el.querySelector('[data-share]').onclick = function (e) {
+      e.stopPropagation();
+      var url = location.origin + '?reel=' + post.id;
+      if (navigator.clipboard) navigator.clipboard.writeText(url);
+      toast('لینک کپی شد');
+    };
+
+    el.querySelector('.reel-user').onclick = function (e) {
+      e.stopPropagation();
+      openUserProfile(post.user_id);
+    };
+
+    return el;
+  }
+
+  function setupReelObserver() {
+    if (reelObserver) reelObserver.disconnect();
+
+    reelObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var video = entry.target.querySelector('video');
+        if (!video) return;
+        if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
+          video.currentTime = 0;
+          video.play().catch(function () {});
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: [0, 0.55, 1] });
+
+    document.querySelectorAll('#reelsContainer .reel').forEach(function (reel) {
+      reelObserver.observe(reel);
+    });
   }
 
   // ===== MESSAGES =====
   $('navMessages').onclick = function () {
     hide('homeView'); hide('profileView'); hide('searchView');
     hide('otherProfileView'); hide('chatView');
+    $('reelsView').classList.remove('show');
+    document.querySelectorAll('#reelsContainer video').forEach(function (v) { v.pause(); });
     document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
     show('messagesView');
     loadConversations();
@@ -1688,6 +1953,7 @@
     activeConvId = convId;
     hide('messagesView'); hide('homeView'); hide('profileView');
     hide('searchView'); hide('otherProfileView');
+    $('reelsView').classList.remove('show');
     show('chatView');
     document.querySelectorAll('.bottom-nav button').forEach(function (b) { b.classList.remove('active'); });
 
